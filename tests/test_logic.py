@@ -174,9 +174,43 @@ def test_endpoint_cines_solo_lista_permitida():
 
 def test_browse_mezcla_verificadas_y_tmdb(monkeypatch):
     it = lambda i, v: {"id": i, "type": "tv", "title": f"t{i}", "verified": v, "on": []}
-    monkeypatch.setattr(sources, "browse_sa", lambda s, k, o, c: {"items": [it(1, True), it(2, True)], "next": "n", "verified": True})
+    monkeypatch.setattr(sources, "browse_sa", lambda s, k, o, c, *a: {"items": [it(1, True), it(2, True)], "next": "n", "verified": True})
     monkeypatch.setattr(sources, "provider_ids", lambda: {"movistar": 149})
-    monkeypatch.setattr(sources, "tmdb_catalog", lambda p, k, o, pg: {"items": [it(2, False), it(3, False)], "next": "2", "verified": False})
+    monkeypatch.setattr(sources, "tmdb_catalog", lambda p, k, o, pg, *a: {"items": [it(2, False), it(3, False)], "next": "2", "verified": False})
     r = TestClient(main.app).get("/api/browse?type=tv&platforms=netflix,movistar&order=hype&cursor=").json()
     assert [x["id"] for x in r["items"]] == [1, 2, 3] and r["verified"] is False and r["next"]
     assert [x["verified"] for x in r["items"]][0] is True
+
+
+def test_filtros_llegan_a_la_api_de_enlaces(monkeypatch):
+    monkeypatch.setenv("RAPIDAPI_KEY", "k")
+    monkeypatch.setattr(sources, "_good", ("https://x", {"X-API-Key": "k"}))
+    seen = {}
+    class R:
+        status_code = 200
+        def json(s): return {"shows": [], "hasMore": False}
+    def fake(url, params=None, headers=None, timeout=0):
+        seen.update(params); return R()
+    monkeypatch.setattr(sources.requests, "get", fake)
+    sources.browse_sa(["netflix", "hbo"], "tv", "rate", None, 7.5, 2010, "drama")
+    assert seen["catalogs"] == "netflix.subscription,hbo.subscription" and seen["show_type"] == "series"
+    assert seen["rating_min"] == 75 and seen["year_min"] == 2010 and seen["genres"] == "drama" and seen["order_by"] == "rating"
+
+
+def test_filtros_tmdb_y_genero_sin_equivalente(monkeypatch):
+    calls = []
+    def fake(path, **k):
+        calls.append((path, k)); return {"results": [], "total_pages": 1}
+    monkeypatch.setattr(sources, "tmdb", fake)
+    sources.tmdb_catalog([149], "all", "hype", 1, 8, 2020, "horror")
+    # terror: existe para película (27) pero no para serie -> solo se pide la de películas
+    assert [c[0] for c in calls] == ["/discover/movie"]
+    k = calls[0][1]
+    assert k["with_genres"] == 27 and k["vote_average.gte"] == 8 and k["primary_release_date.gte"] == "2020-01-01"
+
+
+def test_browse_rechaza_parametros_raros():
+    c = TestClient(main.app)
+    assert c.get("/api/browse?genre=nope").status_code == 400
+    assert c.get("/api/browse?minr=99").status_code == 400
+    assert c.get("/api/browse?ymin=5").status_code == 400

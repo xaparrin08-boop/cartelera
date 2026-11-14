@@ -17,6 +17,15 @@ COVERED = {"netflix", "prime", "disney", "hbo", "apple", "mubi", "skyshowtime", 
 SA_ORDER = {"hype": "popularity_1week", "pop": "popularity_1year", "new": "release_date", "rate": "rating"}
 
 
+# id de género de la API de enlaces -> (nombre, id TMDB película, id TMDB serie o None si no existe equivalente)
+GENRES = {"action": ("Acción", 28, 10759), "adventure": ("Aventura", 12, 10759), "animation": ("Animación", 16, 16),
+          "comedy": ("Comedia", 35, 35), "crime": ("Crimen", 80, 80), "documentary": ("Documental", 99, 99),
+          "drama": ("Drama", 18, 18), "family": ("Familiar", 10751, 10751), "fantasy": ("Fantasía", 14, 10765),
+          "horror": ("Terror", 27, None), "mystery": ("Misterio", 9648, 9648), "romance": ("Romance", 10749, None),
+          "scifi": ("Ciencia ficción", 878, 10765), "thriller": ("Thriller", 53, None), "war": ("Bélica", 10752, 10768),
+          "western": ("Western", 37, 37)}
+
+
 def canon(name):
     """Id de plataforma al que corresponde un nombre de TMDB (incluye variantes: with Ads, Amazon Channel...)."""
     n = name.lower().strip()

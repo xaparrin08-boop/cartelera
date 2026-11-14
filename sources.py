@@ -86,7 +86,7 @@ def provider_ids():
     return {sid: by[n] for sid, names in ALIAS.items() for n in names if n in by}
 
 
-def tmdb_catalog(pid, kind="all", order="hype", page=1):
+def tmdb_catalog(pid, kind="all", order="hype", page=1, minr=0, ymin=0, genre=""):
     pids = pid if isinstance(pid, (list, tuple)) else [pid]
     """Catálogo por TMDB (datos tipo JustWatch): NO verificado, sin enlace directo."""
     from datetime import date
@@ -102,6 +102,18 @@ def tmdb_catalog(pid, kind="all", order="hype", page=1):
             p["primary_release_date.lte" if k == "movie" else "first_air_date.lte"] = today
         if order == "rate":
             p["vote_count.gte"] = 200
+        if minr:
+            p["vote_average.gte"] = minr
+            p.setdefault("vote_count.gte", 50)
+        if ymin:
+            p["primary_release_date.gte" if k == "movie" else "first_air_date.gte"] = f"{int(ymin)}-01-01"
+        if genre:
+            from logic import GENRES
+            g = GENRES.get(genre)
+            gid = g and (g[1] if k == "movie" else g[2])
+            if not gid:
+                return [], 1  # ese género no existe para este tipo en TMDB
+            p["with_genres"] = gid
         r = tmdb(f"/discover/{k}", **p)
         return [dict(card(x, k), on=[], verified=False) for x in r.get("results", []) if x.get("poster_path")], r.get("total_pages", 1)
     with ThreadPoolExecutor(2) as ex:
@@ -135,9 +147,15 @@ def omdb(imdb_id):
 
 
 def details(kind, tid):
-    d = tmdb(f"/{kind}/{tid}", append_to_response="external_ids")
+    d = tmdb(f"/{kind}/{tid}", append_to_response="external_ids,credits,recommendations")
     imdb = d.get("imdb_id") or (d.get("external_ids") or {}).get("imdb_id")
-    return {**card(d, kind), "imdb_id": imdb, "overview": d.get("overview"), "genres": [g["name"] for g in d.get("genres", [])],
+    cr = d.get("credits") or {}
+    cast = [{"name": c["name"], "role": c.get("character") or "", "photo": IMG + "w185" + c["profile_path"] if c.get("profile_path") else None}
+            for c in cr.get("cast", [])[:12]]
+    directors = [c["name"] for c in cr.get("crew", []) if c.get("job") == "Director"][:3] or [c["name"] for c in d.get("created_by", [])][:3]
+    similar = [card(x, kind) for x in (d.get("recommendations") or {}).get("results", []) if x.get("poster_path")][:14]
+    return {**card(d, kind), "imdb_id": imdb, "cast": cast, "directors": directors, "similar": similar,
+            "countries": [c["name"] for c in d.get("production_countries", [])], "overview": d.get("overview"), "genres": [g["name"] for g in d.get("genres", [])],
             "backdrop": IMG + "w780" + d["backdrop_path"] if d.get("backdrop_path") else None,
             "runtime": d.get("runtime")}
 
@@ -229,7 +247,7 @@ def services():
     return out
 
 
-def browse_sa(sids, kind="all", order="hype", cursor=None):
+def browse_sa(sids, kind="all", order="hype", cursor=None, minr=0, ymin=0, genre=""):
     """Catálogo de una o varias plataformas en España, con enlace directo en cada título (verificado)."""
     key = os.environ.get("RAPIDAPI_KEY", "")
     if not key:
@@ -241,6 +259,12 @@ def browse_sa(sids, kind="all", order="hype", cursor=None):
          "series_granularity": "show", "output_language": "es"}
     if kind in ("movie", "tv"):
         p["show_type"] = "movie" if kind == "movie" else "series"
+    if minr:
+        p["rating_min"] = int(minr * 10)
+    if ymin:
+        p["year_min"] = int(ymin)
+    if genre:
+        p["genres"] = genre
     if cursor:
         p["cursor"] = cursor
     r = requests.get(f"{base}/shows/search/filters", params=p, headers=h, timeout=15)

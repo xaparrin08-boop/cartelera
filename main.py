@@ -139,10 +139,11 @@ def _dec(s):
 
 
 @app.get("/api/browse")
-def browse(type: str = "tv", platforms: str = "", order: str = "hype", cursor: str = ""):
+def browse(type: str = "all", platforms: str = "", order: str = "hype", cursor: str = "", minr: float = 0, ymin: int = 0, genre: str = ""):
     """Películas o series filtradas por varias plataformas a la vez.
     Las que la API de enlaces cubre van verificadas; Movistar+/Filmin/Rakuten van por TMDB (sin verificar)."""
-    if type not in ("movie", "tv", "all") or order not in logic.SA_ORDER:
+    if (type not in ("movie", "tv", "all") or order not in logic.SA_ORDER or not 0 <= minr <= 9.5
+            or not (ymin == 0 or 1900 <= ymin <= 2100) or (genre and genre not in logic.GENRES)):
         raise HTTPException(400, "Parámetros no válidos")
     sids = [s for s in dict.fromkeys(platforms.split(",")) if s in logic.ALIAS]
     if not sids:
@@ -150,17 +151,17 @@ def browse(type: str = "tv", platforms: str = "", order: str = "hype", cursor: s
     cov = [s for s in sids if s in logic.COVERED]
     unc = [s for s in sids if s not in logic.COVERED]
     cur = _dec(cursor)
-    key = f"browse:{type}:{','.join(sorted(sids))}:{order}:{cursor}"
+    key = f"browse2:{type}:{','.join(sorted(sids))}:{order}:{minr}:{ymin}:{genre}:{cursor}"
 
     def run():
         lanes = {}
         if cov and not cur.get("sa_done"):
-            lanes["sa"] = lambda: sources.browse_sa(cov, type, order, cur.get("sa"))
+            lanes["sa"] = lambda: sources.browse_sa(cov, type, order, cur.get("sa"), minr, ymin, genre)
         if unc and not cur.get("tm_done"):
             ids = cached("providerids:es", 7 * H24, sources.provider_ids)
             pids = [ids[s] for s in unc if s in ids]
             if pids:
-                lanes["tm"] = lambda: sources.tmdb_catalog(pids, type, order, int(cur.get("tm") or 1))
+                lanes["tm"] = lambda: sources.tmdb_catalog(pids, type, order, int(cur.get("tm") or 1), minr, ymin, genre)
         if not lanes:
             return {"items": [], "next": None, "verified": True}
         with ThreadPoolExecutor(len(lanes)) as ex:
@@ -216,7 +217,7 @@ def title(kind: str, tid: int, mine: str = ""):
         except HTTPException:
             return [], False  # sin fuente de enlaces: no se afirma nada como disponible
     with ThreadPoolExecutor(3) as ex:
-        f_info = ex.submit(lambda: cached(f"det:{kind}:{tid}", 7 * H24, lambda: sources.details(kind, tid)))
+        f_info = ex.submit(lambda: cached(f"det2:{kind}:{tid}", 7 * H24, lambda: sources.details(kind, tid)))
         f_sa = ex.submit(get_sa)
         f_prov = ex.submit(lambda: cached(f"prov:{kind}:{tid}", H12, lambda: sources.tmdb_providers(kind, tid)))
         info, (opts, verified), prov = f_info.result(), f_sa.result(), f_prov.result()

@@ -70,16 +70,31 @@ select{color:var(--tx);border-radius:14px;padding:10px 12px;font-size:16px;borde
 .up{display:flex;gap:13px;align-items:center;padding:11px 13px;margin:9px 16px;border-radius:22px}.up img{width:58px;height:87px;object-fit:cover;border-radius:12px;flex:none;background:rgba(255,255,255,.08)}
 .up b{display:block;line-height:1.25;font-weight:680}.dt{flex:none;width:50px;text-align:center;font-weight:800;line-height:1.05}.dt small{display:block;color:var(--a2);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 
-.on{position:absolute;right:6px;bottom:6px;display:flex;gap:3px}.on img{width:21px;height:21px;border-radius:7px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.35)}
+.onp{position:absolute;right:6px;bottom:6px;display:flex;gap:3px}.onp img{width:21px;height:21px;border-radius:7px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.35)}
 .unv{position:absolute;top:7px;right:7px;border-radius:9px;padding:1px 8px;font-size:13px;font-weight:800;color:var(--warn)}
 .cb{margin:10px 16px;padding:14px;border-radius:24px}.cbh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.cbh small{color:var(--mut)}
 .mv{display:flex;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.1)}.mvp{flex:0 0 58px;height:87px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.08)}.mvp img{width:100%;height:100%;object-fit:cover;display:block}
 .mvb{min-width:0;flex:1}.mvb>b{display:block;font-weight:700;line-height:1.25;margin-bottom:5px}.vs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0}.vs small{color:var(--mut);font-size:12px;min-width:56px}
 .tm{display:inline-flex;align-items:baseline;gap:5px;padding:6px 11px;border-radius:12px;background:rgba(255,255,255,.1);color:var(--tx);text-decoration:none;font-weight:750;font-size:14px;border:1px solid rgba(255,255,255,.14)}
 .tm.win{background:linear-gradient(150deg,rgba(60,214,160,.55),rgba(40,170,130,.32));border-color:rgba(170,255,220,.5)}.tm i{font-style:normal;font-weight:600;font-size:10px;color:var(--mut)}
-/* ===== Dock =====
-.dock{background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(12,10,28,.5);position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(94vw,480px);display:grid;grid-template-columns:repeat(5,1fr);padding:6px;border-radius:32px;z-index:30}
-.dock .ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/5);border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.35);transition:transform .55s var(--spring)}
+.ctl{display:flex;gap:8px;align-items:center;margin-top:9px}.ctl[hidden]{display:none}
+.seg3{flex:1;display:flex;padding:4px;border-radius:17px}.seg3 span{flex:1;text-align:center;padding:9px 4px;border-radius:13px;font-size:13.5px;font-weight:700;color:var(--mut);transition:color .25s,background .3s}
+.seg3 span.on{color:var(--tx);background:linear-gradient(160deg,rgba(255,255,255,.32),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 10px rgba(0,0,0,.25)}
+.ic{width:46px;height:46px;border-radius:16px;color:var(--tx);font-size:19px;border:1px solid var(--gbd);position:relative;display:grid;place-items:center;padding:0;flex:none}
+.ic b{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;border-radius:10px;background:linear-gradient(150deg,var(--a1),var(--a2));font-size:11px;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sumline{display:flex;flex-direction:column;gap:2px;margin:8px 16px 12px}.sumline>span{font-size:15px;align-self:flex-start}.sumline small{color:var(--mut);font-size:12.5px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 10px;padding:0 10px}.grid2 .card{flex:none}.grid2 .card .p{border-radius:18px}
+@media(min-width:620px){.grid2{grid-template-columns:repeat(4,1fr)}}
+.tvb{position:absolute;top:7px;left:7px;border-radius:9px;padding:1px 8px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.pop{position:fixed;z-index:70;padding:6px;border-radius:22px;min-width:220px}.pi{padding:13px 15px;border-radius:15px;font-weight:660}.pi.on{background:rgba(255,255,255,.15)}
+.fh{font-size:16px!important;margin:18px 16px 9px!important}
+.applybar{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom));margin:26px 16px 0;padding:10px;border-radius:26px;display:flex;gap:10px;z-index:5}.applybar .btn{flex:1;text-align:center}
+.cst{flex:0 0 86px;text-align:center}.cst img,.cst i{width:74px;height:74px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.1);display:grid;place-items:center;margin:0 auto 6px;font-style:normal;font-size:26px}
+.cst b{display:block;font-size:12.5px;line-height:1.2;font-weight:650}.cst small{display:block;font-size:11.5px;color:var(--mut);line-height:1.2;margin-top:2px}
+.info{margin:0 16px;padding:6px 16px;border-radius:22px}.info div{display:flex;gap:14px;padding:11px 0;border-top:1px solid rgba(255,255,255,.1)}.info div:first-child{border-top:0}.info span{flex:0 0 92px;color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}.info b{font-weight:600;flex:1}
+/* ===== Dock ===== */
+.dock{background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(12,10,28,.5);position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(94vw,480px);display:grid;grid-template-columns:repeat(4,1fr);padding:6px;border-radius:32px;z-index:30}
+.dock .ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/4);border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.35);transition:transform .55s var(--spring)}
 .dock button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 2px 8px;border:0;background:none;color:var(--mut);font-size:10.5px;font-weight:700;transition:color .25s,transform .45s var(--spring)}
 .dock button{text-shadow:0 1px 6px rgba(0,0,0,.6)}.dock button span{font-size:21px;line-height:1.1}.dock button.on{color:var(--tx)}.dock button:active{transform:scale(.9)}
 
@@ -101,10 +116,10 @@ select{color:var(--tx);border-radius:14px;padding:10px 12px;font-size:16px;borde
 <div id="amb"></div>
 <div class="wrap">
 <header class="top" id="top"><div class="brandrow"><img src="/static/logo.svg" alt=""><b>Cartel<i>era</i></b></div>
-<label class="search glass" id="sb"><span>🔍</span><input id="q" type="search" enterkeyhint="search" placeholder="Busca una peli o serie…" autocomplete="off"><button class="x" id="qx" aria-label="Borrar">✕</button></label></header>
+<label class="search glass" id="sb"><span>🔍</span><input id="q" type="search" enterkeyhint="search" placeholder="Busca una peli o serie…" autocomplete="off"><button class="x" id="qx" aria-label="Borrar">✕</button></label><div class="ctl" id="ctl" hidden></div></header>
 <main id="app"></main></div>
 <nav class="dock glass" id="dock"><i class="ind" id="ind"></i>
-<button data-t="inicio"><span>🍿</span>Inicio</button><button data-t="peli"><span>🎬</span>Películas</button><button data-t="series"><span>📺</span>Series</button><button data-t="cines"><span>📍</span>Cines</button><button data-t="tu"><span>👤</span>Tú</button></nav>
+<button data-t="inicio"><span>🍿</span>Inicio</button><button data-t="explorar"><span>🔥</span>Explorar</button><button data-t="cines"><span>📍</span>Cines</button><button data-t="tu"><span>👤</span>Tú</button></nav>
 <script>
 "use strict";
 /* ---------- datos fijos ---------- */
@@ -112,7 +127,7 @@ const PLAT={netflix:"Netflix",prime:"Prime Video",disney:"Disney+",hbo:"Max",app
 const COVERED=new Set(["netflix","prime","disney","hbo","apple","mubi","skyshowtime","crunchyroll","plutotv"]);
 const PRESETS=[{id:"p-quad",code:"G01LE",short:"Quadernillos",name:"O-Cine Quadernillos",address:"Alcalá de Henares",website:"https://tickets.ocinequadernillos.es/"},{id:"p-yelmo",code:"E0291",short:"Parque Corredor",name:"Yelmo Parque Corredor",address:"Torrejón de Ardoz",website:"https://www.cineyelmo.com/es"}];
 const SORTS={hype:["🔥 Más hype",m=>-m.pop],pop:["⭐ Populares",m=>-m.votes],new:["🆕 Recién estrenadas",m=>m.date,1],rate:["🏆 Mejor valoradas",m=>-m.rating]};
-const TABS=["inicio","peli","series","cines","tu"];
+const TABS=["inicio","explorar","cines","tu"];
 const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],DIA=["dom","lun","mar","mié","jue","vie","sáb"];
 /* ---------- utilidades ---------- */
 const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
@@ -125,11 +140,11 @@ async function swr(u,apply){const k="c:"+u;let had=false;const c=ls(k,null);if(c
 const L=x=>Array.isArray(x)?x:Object.assign([],{err:(x&&x.error)||"No disponible ahora mismo"});
 const sortBy=(l,m)=>{if(!l||l.err||!SORTS[m])return l;const[,f,desc]=SORTS[m];return[...l].sort((a,b)=>{const x=f(a),y=f(b);return(x<y?-1:x>y?1:0)*(desc?-1:1)})};
 /* ---------- estado ---------- */
-const S={tab:TABS.includes(ls("tab","inicio"))?ls("tab","inicio"):"inicio",mine:ls("mine",[]),favs:(ls("favs",null)||PRESETS).map(f=>PRESETS.find(p=>p.id==f.id)||f),fsel:ls("fsel",null),br:{},sh:{},shErr:{},shAt:{},showAll:false,hours:ls("hours",[17,21]),
+const S={tab:(t=>TABS.includes(t)?t:["peli","series"].includes(t)?"explorar":"inicio")(ls("tab","inicio")),mine:ls("mine",[]),favs:(ls("favs",null)||PRESETS).map(f=>PRESETS.find(p=>p.id==f.id)||f),fsel:ls("fsel",null),br:{},sh:{},shErr:{},shAt:{},showAll:false,hours:ls("hours",[17,21]),
  sort:ls("sort","hype"),usort:"date",upf:"all",q:"",res:null,np:null,tr:null,ser:null,up:null,logos:{},cines:null,cerr:""};
 const logo=(id,u)=>u||S.logos[id]||"";
 /* ---------- piezas ---------- */
-const card=(m,i=9,sub)=>`<div class="card press" data-k="${m.type}" data-i="${m.id}"><div class="p">${m.poster?`<img ${i<4?'fetchpriority="high"':'loading="lazy"'} decoding="async" alt="" src="${esc(m.poster)}">`:""}<span class="rate glass lite">★ ${m.rating||"–"}</span>${m.verified===false?'<span class="unv glass lite" title="Sin enlace verificado">≈</span>':""}${m.on&&m.on.length?`<span class="on">${m.on.slice(0,3).map(k=>logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:"").join("")}</span>`:""}</div><div class="t">${esc(m.title)}</div><div class="y">${sub||`${m.year||""} · ${m.type=="tv"?"Serie":"Peli"}`}</div></div>`;
+const card=(m,i=9,sub)=>`<div class="card press" data-k="${m.type}" data-i="${m.id}"><div class="p">${m.poster?`<img ${i<4?'fetchpriority="high"':'loading="lazy"'} decoding="async" alt="" src="${esc(m.poster)}">`:""}<span class="rate glass lite">★ ${m.rating||"–"}</span>${m.type=="tv"?'<span class="tvb glass lite">TV</span>':""}${m.verified===false?'<span class="unv glass lite" title="Sin enlace verificado">≈</span>':""}${m.on&&m.on.length?`<span class="onp">${m.on.slice(0,3).map(k=>logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:"").join("")}</span>`:""}</div><div class="t">${esc(m.title)}</div><div class="y">${sub||`${m.year||""} · ${m.type=="tv"?"Serie":"Peli"}`}</div></div>`;
 const rail=l=>l==null?`<div class="rail">${'<div class="sk"></div>'.repeat(5)}</div>`:l.err?`<p class="empty">${esc(l.err)}<br><br><button class="btn glass tint press" data-retry="1">Reintentar</button></p>`:`<div class="rail">${l.map((m,i)=>card(m,i)).join("")}</div>`;
 const sortbar=(cur,modes=Object.keys(SORTS),attr="sort")=>`<div class="seg">${modes.map(k=>`<span class="chip glass press ${cur==k?"tint":""}" data-${attr}="${k}">${SORTS[k]?SORTS[k][0]:"Relevancia"}</span>`).join("")}</div>`;
 const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,t])=>`<span class="chip glass press ${cur==v?"tint":""}" data-${attr}="${v}">${t}</span>`).join("")}</div>`;
@@ -140,7 +155,44 @@ const cineRow=c=>`<div class="row glass lite"><div><b>${esc(c.name)}</b><br><sma
 const sortRes=r=>{const m=S.rsort||"rel";return m=="rel"?r:sortBy(r,m)};
 /* ---------- vistas ---------- */
 const effSel=()=>S.fsel===null?S.mine:S.fsel;
-const BR=k=>S.br[k]||(S.br[k]={order:"hype",items:[],next:null,busy:false,err:"",seq:0,loaded:false});
+const GEN=[["action","Acción"],["adventure","Aventura"],["animation","Animación"],["comedy","Comedia"],["crime","Crimen"],["documentary","Documental"],["drama","Drama"],["family","Familiar"],["fantasy","Fantasía"],["horror","Terror"],["mystery","Misterio"],["romance","Romance"],["scifi","Ciencia ficción"],["thriller","Thriller"],["war","Bélica"],["western","Western"]];
+const EX=Object.assign({kind:ls("exkind","all"),order:ls("exorder","hype"),minr:0,ymin:0,genre:""},ls("exf",{}),{items:[],next:null,busy:false,err:"",seq:0,loaded:false});
+const exSave=()=>{sv("exkind",EX.kind);sv("exorder",EX.order);sv("exf",{minr:EX.minr,ymin:EX.ymin,genre:EX.genre})};
+const exCount=()=>(effSel().length?1:0)+(EX.minr?1:0)+(EX.ymin?1:0)+(EX.genre?1:0);
+const exSummary=()=>{const sel=effSel(),f=[!sel.length?"Todas las plataformas":sel.length<=2?sel.map(x=>PLAT[x]).join(" + "):sel.length+" plataformas"];if(EX.minr)f.push("★ "+EX.minr+"+");if(EX.ymin)f.push("desde "+EX.ymin);if(EX.genre)f.push((GEN.find(g=>g[0]==EX.genre)||[0,EX.genre])[1]);return f.join(" · ")};
+function viewExplore(){const unv=effSel().filter(x=>!COVERED.has(x));
+ return `<div class="sumline"><span class="press" data-xsort="1">Ordenados por <b>${SORTS[EX.order][0]}</b> ▾</span><small>${esc(exSummary())}${unv.length?"":' · <span class="ok">✔ enlace directo</span>'}</small></div>`+
+ (!S.mine.length&&S.fsel===null?`<div class="glass note">Mostrando todas las plataformas. <a data-t="tu" href="#" class="ok">Marca las tuyas</a> para ver solo lo que tienes.</div>`:"")+
+ (unv.length?`<div class="glass tint warn note">≈ <b>${unv.map(x=>PLAT[x]).join(", ")}</b>: datos de TMDB, sin enlace directo. Puede haber títulos que ya no estén.</div>`:"")+
+ (EX.err?`<p class="empty warn">${esc(EX.err)}<br><br><button class="btn glass tint press" data-xretry="1">Reintentar</button></p>`:"")+
+ (EX.items.length?`<div class="grid2">${EX.items.map((m,i)=>card(m,i)).join("")}</div>`:(EX.busy?`<div class="grid2">${'<div class="sk" style="flex:none;height:250px"></div>'.repeat(6)}</div>`:EX.err?"":'<p class="empty">Nada con esos filtros.<br><br><button class="btn glass press" data-xfil="1">Cambiar filtros</button></p>'))+
+ (EX.next&&EX.items.length?`<div id="more" class="pad" style="margin:20px 0;text-align:center"><button class="btn glass press" data-xm="1">${EX.busy?"Cargando…":"Ver más"}</button></div>`:"")}
+async function loadEx(more){if(more&&(EX.busy||!EX.next))return;const my=++EX.seq;EX.busy=true;EX.err="";EX.loaded=true;if(!more){EX.items=[];EX.next=null}render();
+ const q=`type=${EX.kind}&platforms=${effSel().join(",")}&order=${EX.order}&minr=${EX.minr}&ymin=${EX.ymin}&genre=${EX.genre}`+(more&&EX.next?`&cursor=${encodeURIComponent(EX.next)}`:"");
+ try{const r=await api("/api/browse?"+q);if(my!=EX.seq)return;const seen=new Set(EX.items.map(x=>x.type+x.id));EX.items=EX.items.concat(r.items.filter(x=>!seen.has(x.type+x.id)));EX.next=r.next}catch(e){if(my==EX.seq)EX.err=e.message}
+ if(my==EX.seq){EX.busy=false;render();if(!EX.items.length&&EX.next&&!EX.err)loadEx(true)}}
+const resetBrowse=()=>{EX.items=[];EX.next=null;EX.loaded=false;EX.seq++};
+/* ---- barra de controles (fija arriba, como en JustWatch) ---- */
+function drawCtl(){const c=$("#ctl"),on=S.tab=="explorar"&&S.q.length<2;c.hidden=!on;if(!on)return;
+ c.innerHTML=`<div class="seg3 glass lite">${[["all","Todo"],["movie","Películas"],["tv","Series"]].map(([k,v])=>`<span class="press ${EX.kind==k?"on":""}" data-xk="${k}">${v}</span>`).join("")}</div><button class="ic glass lite press" id="sortb" aria-label="Ordenar">⇅</button><button class="ic glass lite press" id="filb" aria-label="Filtros">⚙︎${exCount()?`<b>${exCount()}</b>`:""}</button>`}
+function closePop(){const p=$("#pop");if(p)p.remove()}
+function openSortMenu(){if($("#pop"))return closePop();const a=$("#sortb").getBoundingClientRect(),p=document.createElement("div");p.id="pop";p.className="pop glass";
+ p.innerHTML=["hype","pop","new","rate"].map(k=>`<div class="pi press ${EX.order==k?"on":""}" data-xo="${k}">${SORTS[k][0]}${EX.order==k?" ✓":""}</div>`).join("");document.body.append(p);p.style.top=(a.bottom+8)+"px";p.style.right=Math.max(12,innerWidth-a.right)+"px"}
+function openFilters(){const d=document.createElement("div");d.className="sheet";openSheet(d);let f={sel:S.fsel===null?null:[...S.fsel],minr:EX.minr,ymin:EX.ymin,genre:EX.genre};
+ const ch=(attr,val,on,txt,extra="")=>`<span class="chip glass press ${on?"tint":""}" data-${attr}="${val}">${extra}${txt}</span>`;
+ const view=()=>{const s=f.sel===null?S.mine:f.sel,allOn=f.sel!==null?f.sel.length==0:!S.mine.length,mineOn=f.sel===null&&S.mine.length>0;
+  d.innerHTML=`<div class="bgimg"></div>${closeBtn()}<h2 style="margin-top:calc(70px + env(safe-area-inset-top))">Filtros</h2>`+
+  `<h2 class="fh">Plataformas</h2><div class="chips pad">${ch("fp","__mine",mineOn,"👤 Mis plataformas")}${ch("fp","__all",allOn,"Todas")}${Object.entries(PLAT).map(([k,v])=>ch("fp",k,s.includes(k)&&!allOn,v+(COVERED.has(k)?"":" ≈"),logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:"")).join("")}</div>`+
+  `<h2 class="fh">Valoración mínima</h2><div class="chips pad">${[[0,"Todas"],[6,"6+"],[7,"7+"],[8,"8+"]].map(([v,t])=>ch("fm",v,f.minr==v,t)).join("")}</div>`+
+  `<h2 class="fh">Año de estreno</h2><div class="chips pad">${[[0,"Todos"],[2020,"2020 o después"],[2010,"2010 o después"],[2000,"2000 o después"],[1990,"1990 o después"]].map(([v,t])=>ch("fy",v,f.ymin==v,t)).join("")}</div>`+
+  `<h2 class="fh">Género</h2><div class="chips pad">${ch("fg","",!f.genre,"Todos")}${GEN.map(([k,v])=>ch("fg",k,f.genre==k,v)).join("")}</div>`+
+  `<div class="applybar glass"><button class="btn glass press" data-fr="1">Restablecer</button><button class="btn glass tint press" data-fa="1">Mostrar resultados</button></div><div style="height:40px"></div>`};
+ d.addEventListener("click",e=>{const t=e.target;if(t.closest(".close"))return closeSheet(d);const c=t.closest("[data-fp],[data-fm],[data-fy],[data-fg],[data-fr],[data-fa]");if(!c)return;buzz(6);const D=c.dataset;
+  if("fp"in D){const v=D.fp;if(v=="__mine")f.sel=null;else if(v=="__all")f.sel=[];else{let a=f.sel===null?[...S.mine]:[...f.sel];a=a.includes(v)?a.filter(x=>x!=v):[...a,v];f.sel=a}}
+  else if("fm"in D)f.minr=+D.fm;else if("fy"in D)f.ymin=+D.fy;else if("fg"in D)f.genre=D.fg;
+  else if("fr"in D)f={sel:null,minr:0,ymin:0,genre:""};
+  else if("fa"in D){S.fsel=f.sel;sv("fsel",S.fsel);EX.minr=f.minr;EX.ymin=f.ymin;EX.genre=f.genre;exSave();closeSheet(d);loadEx(false);return}
+  const st=d.scrollTop;view();d.scrollTop=st});view()}
 const nowHM=()=>{const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
 const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const inWin=t=>{const h=+t.slice(0,2)+ +t.slice(3)/60;return h>=S.hours[0]&&h<=S.hours[1]};
@@ -148,21 +200,6 @@ const inWin=t=>{const h=+t.slice(0,2)+ +t.slice(3)/60;return h>=S.hours[0]&&h<=S
 function sessions(d,all){if(!d||!d.movies)return[];const today=d.date==todayStr(),now=nowHM();
  return d.movies.map(m=>({...m,versions:m.versions.map(v=>({...v,times:v.times.filter(t=>(!today||t.t>=now)&&(all||inWin(t.t)))})).filter(v=>v.times.length)})).filter(m=>m.versions.length)}
 const myCines=()=>S.favs.filter(c=>c.code);
-const brChips=()=>{const sel=effSel(),allOn=S.fsel!==null?S.fsel.length==0:!S.mine.length,mineOn=S.fsel===null&&S.mine.length>0;
- return `<div class="seg"><span class="chip glass press ${mineOn?"tint":""}" data-bp="__mine">👤 Mis plataformas</span><span class="chip glass press ${allOn?"tint":""}" data-bp="__all">Todas</span>${Object.entries(PLAT).map(([k,v])=>`<span class="chip glass press ${sel.includes(k)&&!allOn?"tint":""}" data-bp="${k}">${logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:""}${v}${COVERED.has(k)?"":" ≈"}</span>`).join("")}</div>`};
-function viewBrowse(kind){const b=BR(kind),tv=kind=="tv",sel=effSel(),unv=sel.filter(x=>!COVERED.has(x));
- return `<h2>${tv?"Series":"Películas"} <small>${sel.length?sel.length+(sel.length>1?" plataformas":" plataforma"):"todas las plataformas"}</small></h2>${brChips()}`+
- `<div class="seg">${["hype","pop","new","rate"].map(k=>`<span class="chip glass press ${b.order==k?"tint":""}" data-bo="${k}">${SORTS[k][0]}</span>`).join("")}</div>`+
- (!S.mine.length&&S.fsel===null?`<div class="glass note">Mostrando todas las plataformas. <a data-t="tu" href="#" class="ok">Marca las tuyas</a> para ver solo lo que tienes.</div>`:"")+
- (unv.length?`<div class="glass tint warn note">≈ <b>${unv.map(x=>PLAT[x]).join(", ")}</b>: datos de TMDB, sin enlace directo. Puede haber títulos que ya no estén.</div>`:`<div class="glass note ok">✔ Solo títulos con enlace directo verificado.</div>`)+
- (b.err?`<p class="empty warn">${esc(b.err)}<br><br><button class="btn glass tint press" data-bretry="${kind}">Reintentar</button></p>`:"")+
- (b.items.length?`<div class="grid">${b.items.map((m,i)=>card(m,i)).join("")}</div>`:(b.busy?`<div class="rail">${'<div class="sk"></div>'.repeat(4)}</div>`:b.err?"":'<p class="empty">Nada con esos filtros.</p>'))+
- (b.next?`<div id="more" class="pad" style="margin:20px 0;text-align:center"><button class="btn glass press" data-bm="${kind}">${b.busy?"Cargando…":"Ver más"}</button></div>`:"")}
-async function loadBrowse(kind,more){const b=BR(kind);if(more&&(b.busy||!b.next))return;const my=++b.seq;b.busy=true;b.err="";b.loaded=true;if(!more){b.items=[];b.next=null}render();
- try{const r=await api(`/api/browse?type=${kind}&platforms=${effSel().join(",")}&order=${b.order}`+(more&&b.next?`&cursor=${encodeURIComponent(b.next)}`:""));if(my!=b.seq)return;
-  const seen=new Set(b.items.map(x=>x.type+x.id));b.items=b.items.concat(r.items.filter(x=>!seen.has(x.type+x.id)));b.next=r.next}catch(e){if(my==b.seq)b.err=e.message}
- if(my==b.seq){b.busy=false;render()}}
-const resetBrowse=()=>{["movie","tv"].forEach(k=>{const b=BR(k);b.items=[];b.next=null;b.loaded=false;b.seq++})};
 /* ---- cines ---- */
 const timeChip=(t,c)=>`<a class="tm ${inWin(t.t)?"win":""}" href="${esc(c.website||"#")}" target="_blank" rel="noopener">${t.t}${t.fmt.length?`<i>${esc(t.fmt.join("·"))}</i>`:""}</a>`;
 const movieRow=(m,c)=>`<div class="mv"><div class="mvp ${m.id?"press":""}" ${m.id?`data-k="movie" data-i="${m.id}"`:""}>${m.poster?`<img loading="lazy" decoding="async" alt="" src="${esc(m.poster)}">`:""}</div><div class="mvb"><b ${m.id?`class="press" data-k="movie" data-i="${m.id}"`:""}>${esc(m.title)}</b>${m.versions.map(v=>`<div class="vs"><small>${esc(v.label||"")}</small>${v.times.map(t=>timeChip(t,c)).join("")}</div>`).join("")}</div></div>`;
@@ -185,8 +222,7 @@ function render(){const a=$("#app"),sc=[...a.querySelectorAll(".seg,.rail")].map
   `<h2>Tendencias <small>esta semana</small></h2>${rail(S.tr)}`+
   `<h2>Próximos estrenos <small><a data-ul="1" href="#" style="color:inherit">ver todo</a></small></h2>${up==null?rail(null):up.err?`<p class="empty">${esc(up.err)}</p>`:`<div class="rail">${up.map((m,i)=>card(m,i+4,(()=>{const d=new Date(m.date+"T12:00:00");return DIA[d.getDay()]+" "+d.getDate()+" "+MES[d.getMonth()].slice(0,3)})())).join("")}</div>`}`+
   (S.mine.length?"":`<div class="glass note"><b>Elige tus plataformas</b><br><span class="mut">Así filtro Películas y Series por las que tienes.</span><br><br><button class="btn glass tint press" data-t="tu">Elegir</button></div>`)}
- else if(S.tab=="peli")a.innerHTML=viewBrowse("movie");
- else if(S.tab=="series")a.innerHTML=viewBrowse("tv");
+ else if(S.tab=="explorar")a.innerHTML=viewExplore();
  else if(S.tab=="cines"){const cs=myCines();
   a.innerHTML=`<h2>Hoy en tus cines</h2><div class="seg"><span class="chip glass press ${S.showAll?"":"tint"}" data-sh="win">⏰ Mis horas ${S.hours[0]}–${S.hours[1]}h</span><span class="chip glass press ${S.showAll?"tint":""}" data-sh="all">Todo el día</span></div>`+
   (cs.length?cs.map(cineBox).join(""):'<p class="empty">Pulsa ☆ en un cine para fijarlo.</p>')+
@@ -195,8 +231,8 @@ function render(){const a=$("#app"),sc=[...a.querySelectorAll(".seg,.rail")].map
   cs.forEach(c=>loadShow(c.code))}
  else a.innerHTML=`<h2>Mis plataformas</h2><p class="pad mut" style="margin:-4px 0 12px">Marca las que tienes: Películas y Series se filtrarán por ellas. Con las marcadas con <b class="warn">≈</b> (Movistar+, Filmin, Rakuten) no puedo verificar enlaces: te diré "posible", nunca "seguro".</p><div class="chips pad">${Object.entries(PLAT).map(([k,v])=>`<span class="chip glass press ${S.mine.includes(k)?"tint":""}" data-p="${k}">${logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:""}${v}${COVERED.has(k)?"":" ≈"}</span>`).join("")}</div><h2>Mis horas de cine</h2><div class="pad" style="display:flex;gap:10px;align-items:center"><select id="h0">${hopt(S.hours[0])}</select> a <select id="h1">${hopt(S.hours[1])}</select></div>`;
  const sc2=[...a.querySelectorAll(".seg,.rail")];if(sc2.length==sc.length)sc2.forEach((e,i)=>{e.scrollLeft=sc[i]});
- const mo=$("#more");if(mo)io.observe(mo)}
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const k=S.tab=="peli"?"movie":S.tab=="series"?"tv":null;if(k)loadBrowse(k,true)})},{rootMargin:"700px"});
+ drawCtl();const mo=$("#more");if(mo)io.observe(mo)}
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;if(S.tab=="explorar")loadEx(true)})},{rootMargin:"700px"});
 /* ---- próximos estrenos (hoja) ---- */
 function openUpcoming(){const d=document.createElement("div");d.className="sheet";openSheet(d);const st={f:"all",s:"date"};
  const view=()=>{const up=S.up,l=up&&!up.err?up.filter(m=>st.f=="all"||m.type==st.f):null;let h="";
@@ -231,7 +267,10 @@ async function openTitle(k,i){const d=document.createElement("div");d.className=
   d.innerHTML=`<div class="bgimg" style="background-image:url('${esc(bg)}')"></div>${closeBtn()}<div class="hero" style="background-image:url('${esc(bg)}')"></div><div class="dh"><h1>${esc(m.title)}</h1><div class="meta">${m.year||""} · ${m.type=="tv"?"Serie":"Película"}${m.runtime?" · "+m.runtime+" min":""}</div><div class="chips">${(m.genres||[]).map(g=>`<span class="chip glass lite">${esc(g)}</span>`).join("")}</div></div>${ratings(m)}${verdict}`+
   (yes?`<h2>En tus plataformas</h2>${v.on_mine.map(opt).join("")}`:"")+(v.other_subscription.length?`<h2>Otras plataformas</h2>${v.other_subscription.map(opt).join("")}`:"")+(v.rent_buy.length?`<h2>Alquiler / compra</h2>${v.rent_buy.map(opt).join("")}`:"")+
   (v.unconfirmed.length?`<h2 class="warn">Sin confirmar</h2><div class="glass note">Una fuente (TMDB) apunta a <b>${esc(v.unconfirmed.join(", "))}</b>, pero sin enlace directo.${v.tmdb_link?` <a class="ok" href="${esc(v.tmdb_link)}" target="_blank" rel="noopener">Comprobarlo ↗</a>`:""}</div>`:"")+
-  `<h2>Sinopsis</h2><p class="syn">${esc(m.overview||"Sin sinopsis.")}</p><div style="height:60px"></div>`}catch(e){const r=d.querySelector(".rail");if(r)r.outerHTML=`<p class="empty warn">${esc(e.message)}</p>`}}
+  `<h2>Sinopsis</h2><p class="syn">${esc(m.overview||"Sin sinopsis.")}</p>`+
+  ((m.directors&&m.directors.length)||(m.countries&&m.countries.length)||m.runtime?`<h2>Datos</h2><div class="info glass lite">${m.directors&&m.directors.length?`<div><span>${m.type=="tv"?"Creación":"Director"}</span><b>${esc(m.directors.join(", "))}</b></div>`:""}${m.countries&&m.countries.length?`<div><span>País</span><b>${esc(m.countries.join(", "))}</b></div>`:""}${m.runtime?`<div><span>Duración</span><b>${Math.floor(m.runtime/60)?Math.floor(m.runtime/60)+" h ":""}${m.runtime%60} min</b></div>`:""}${m.genres&&m.genres.length?`<div><span>Géneros</span><b>${esc(m.genres.join(", "))}</b></div>`:""}</div>`:"")+
+  (m.cast&&m.cast.length?`<h2>Reparto</h2><div class="rail">${m.cast.map(c=>`<div class="cst">${c.photo?`<img loading="lazy" decoding="async" alt="" src="${esc(c.photo)}">`:"<i>👤</i>"}<b>${esc(c.name)}</b><small>${esc(c.role)}</small></div>`).join("")}</div>`:"")+
+  (m.similar&&m.similar.length?`<h2>También les gustó</h2><div class="rail">${m.similar.map((x,i)=>card(x,i+9)).join("")}</div>`:"")+'<div style="height:70px"></div>'}catch(e){const r=d.querySelector(".rail");if(r)r.outerHTML=`<p class="empty warn">${esc(e.message)}</p>`}}
 /* ---------- plataforma ---------- */
 function openPlatform(sid){const d=document.createElement("div");d.className="sheet";openSheet(d);
  const st={type:"all",order:["hype","pop","new","rate"].includes(S.sort)?S.sort:"hype",items:[],next:null,err:"",busy:true,ver:COVERED.has(sid),n:0};
@@ -246,8 +285,8 @@ function openPlatform(sid){const d=document.createElement("div");d.className="sh
   if(c.dataset.ptype){st.type=c.dataset.ptype;load(false)}else if(c.dataset.porder){st.order=c.dataset.porder;load(false)}else load(true)});
  load(false)}
 /* ---------- eventos ---------- */
-function go(t){S.tab=t;sv("tab",t);S.q="";$("#q").value="";$("#sb").classList.remove("has");render();scrollTo({top:0});const k=t=="peli"?"movie":t=="series"?"tv":null;if(k&&!BR(k).loaded)loadBrowse(k,false)}
-document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-bp],[data-bo],[data-bm],[data-bretry],[data-sh],[data-ul],[data-sort],[data-rsort],[data-pl],[data-retry],#qx");if(!t)return;
+function go(t){S.tab=t;sv("tab",t);S.q="";$("#q").value="";$("#sb").classList.remove("has");render();scrollTo({top:0});if(t=="explorar"&&!EX.loaded)loadEx(false)}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-xk],[data-xsort],#sortb,#filb,[data-xo],[data-xm],[data-xretry],[data-xfil],[data-sh],[data-ul],[data-sort],[data-rsort],[data-pl],[data-retry],#qx");if(!t)return;
  if(t.closest(".sheet")&&!(t.matches(".card")))return;
  if(t.id=="qx"){$("#q").value="";S.q="";$("#sb").classList.remove("has");render();return}
  if(t.dataset.t){e.preventDefault();buzz(6);go(t.dataset.t)}
@@ -257,14 +296,17 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p
  else if(t.dataset.sort){S.sort=t.dataset.sort;sv("sort",S.sort);buzz(6);render()}
  else if(t.dataset.rsort){S.rsort=t.dataset.rsort;render()}
  else if(t.dataset.ul){e.preventDefault();openUpcoming()}
- else if(t.dataset.bp){const v=t.dataset.bp;if(v=="__mine")S.fsel=null;else if(v=="__all")S.fsel=[];else{let c=S.fsel===null?[...S.mine]:[...S.fsel];c=c.includes(v)?c.filter(x=>x!=v):[...c,v];S.fsel=c}sv("fsel",S.fsel);buzz(6);resetBrowse();const k=S.tab=="peli"?"movie":"tv";loadBrowse(k,false)}
- else if(t.dataset.bo){const k=S.tab=="peli"?"movie":"tv";BR(k).order=t.dataset.bo;buzz(6);loadBrowse(k,false)}
- else if(t.dataset.bm){loadBrowse(t.dataset.bm,true)}
- else if(t.dataset.bretry){loadBrowse(t.dataset.bretry,false)}
+ else if(t.dataset.xk){EX.kind=t.dataset.xk;exSave();buzz(6);loadEx(false)}
+ else if(t.id=="sortb"||t.dataset.xsort){e.stopPropagation();openSortMenu()}
+ else if(t.id=="filb"||t.dataset.xfil){buzz(6);openFilters()}
+ else if(t.dataset.xo){EX.order=t.dataset.xo;exSave();closePop();buzz(6);loadEx(false)}
+ else if(t.dataset.xm){loadEx(true)}
+ else if(t.dataset.xretry){loadEx(false)}
  else if(t.dataset.sh){S.showAll=t.dataset.sh=="all";buzz(6);render()}
  else if(t.dataset.p){const p=t.dataset.p;S.mine=S.mine.includes(p)?S.mine.filter(x=>x!=p):[...S.mine,p];sv("mine",S.mine);buzz(8);resetBrowse();render()}
  else if(t.dataset.f){const c=(S.cines||[]).concat(S.favs,PRESETS).find(x=>x.id==t.dataset.f);if(!c)return;S.favs=S.favs.some(x=>x.id==c.id)?S.favs.filter(x=>x.id!=c.id):[...S.favs,c];sv("favs",S.favs);buzz(8);render()}
  else if(t.id=="loc"){t.textContent="Buscando…";S.cerr="";navigator.geolocation.getCurrentPosition(async p=>{try{S.cines=await api(`/api/cinemas?lat=${p.coords.latitude}&lon=${p.coords.longitude}&radius_km=12`)}catch(er){S.cerr=er.message}render()},()=>{S.cerr="Sin permiso de ubicación. Actívalo en los ajustes del navegador.";render()},{timeout:10000})}});
+document.addEventListener("click",e=>{if(!e.target.closest("#pop,#sortb,[data-xsort]"))closePop()},true);
 document.addEventListener("change",e=>{if(e.target.id=="h0"||e.target.id=="h1"){let a=+$("#h0").value,b=+$("#h1").value;if(b<=a)b=Math.min(23,a+1);S.hours=[a,b];sv("hours",S.hours);render()}});
 let tm,seq=0;$("#q").addEventListener("input",e=>{clearTimeout(tm);const q=S.q=e.target.value.trim();$("#sb").classList.toggle("has",!!e.target.value);
  if(q.length<2){S.res=null;render();return}S.res=null;render();const my=++seq;tm=setTimeout(async()=>{try{const r=await api("/api/search?q="+encodeURIComponent(q));if(my==seq)S.res=r}catch(er){if(my==seq)S.res=Object.assign([],{err:er.message})}if(my==seq)render()},280)});
@@ -273,6 +315,6 @@ let ticking=false;addEventListener("scroll",()=>{if(ticking)return;ticking=true;
 /* ---------- carga ---------- */
 function loadHome(){swr("/api/home",(d,stale,err)=>{if(!d){S.np=S.tr=Object.assign([],{err});S.ser={popular:S.np,airing:S.np};render();return}S.np=L(d.np);S.tr=L(d.tr);S.ser=d.ser;S.logos=d.logos&&!d.logos.error?d.logos:S.logos;render()})}
 function loadUp(cb){if(S.up&&!S.up.err){cb&&cb();return}swr("/api/upcoming",(d,s,err)=>{S.up=d?L(d):Object.assign([],{err});render();cb&&cb()})}
-render();loadHome();loadUp();myCines().forEach(c=>loadShow(c.code));if(S.tab=="peli")loadBrowse("movie");if(S.tab=="series")loadBrowse("tv");
+render();loadHome();loadUp();myCines().forEach(c=>loadShow(c.code));if(S.tab=="explorar")loadEx(false);
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 </script></body></html>
