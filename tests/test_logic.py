@@ -110,3 +110,18 @@ def test_addon_no_cuenta_como_tuyo():
     r = logic.split(c, ["prime"])
     assert [o["type"] for o in r["on_mine"]] == ["subscription"]
     assert [o["type"] for o in r["other_subscription"]] == ["addon"]
+
+
+def test_catalogo_solo_con_enlace(monkeypatch):
+    monkeypatch.setenv("RAPIDAPI_KEY", "k")
+    monkeypatch.setattr(sources, "_good", ("https://x", {"X-API-Key": "k"}))
+    show = lambda tm, link: {"tmdbId": tm, "title": "T", "releaseYear": 2020, "rating": 85,
+        "imageSet": {"verticalPoster": {"w240": "p"}},
+        "streamingOptions": {"es": [{"service": {"id": "netflix"}, "type": "subscription", "link": link}]}}
+    class R:
+        status_code = 200
+        def json(s): return {"shows": [show("movie/1", "https://n/1"), show("tv/2", ""), show("raro", "https://n/3")],
+                             "hasMore": True, "nextCursor": "abc"}
+    monkeypatch.setattr(sources.requests, "get", lambda *a, **k: R())
+    r = sources.platform_catalog("netflix")
+    assert [i["id"] for i in r["items"]] == [1] and r["items"][0]["rating"] == 8.5 and r["next"] == "abc"

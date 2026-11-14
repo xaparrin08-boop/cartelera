@@ -162,6 +162,51 @@ def diag():
     return out
 
 
+def _sa_base_headers(key):
+    """(base, headers) que ya funciona; si no hay, prueba con una ficha conocida."""
+    global _good
+    if not _good:
+        _sa_get("movie", 603, key)
+    if not _good:
+        raise RuntimeError("Streaming Availability no acepta la clave o no responde")
+    return _good
+
+
+def platform_catalog(sid, kind="all", order="popularity_1week", cursor=None):
+    """Catálogo de una plataforma en España, con enlace directo en cada título."""
+    key = os.environ.get("RAPIDAPI_KEY", "")
+    if not key:
+        raise RuntimeError("Falta RAPIDAPI_KEY")
+    base, h = _sa_base_headers(key)
+    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": order, "order_direction": "desc",
+         "series_granularity": "show", "output_language": "es"}
+    if kind in ("movie", "tv"):
+        p["show_type"] = "movie" if kind == "movie" else "series"
+    if cursor:
+        p["cursor"] = cursor
+    r = requests.get(f"{base}/shows/search/filters", params=p, headers=h, timeout=15)
+    if r.status_code != 200:
+        raise RuntimeError(f"Catálogo no disponible ({r.status_code}): {r.text[:160]}")
+    d = r.json()
+    items = []
+    for x in d.get("shows", []):
+        tm = str(x.get("tmdbId", ""))
+        k, _, i = tm.partition("/")
+        if not i.isdigit():
+            continue
+        ps = (x.get("imageSet") or {}).get("verticalPoster") or {}
+        opt = next((o for o in x.get("streamingOptions", {}).get(COUNTRY, [])
+                    if o.get("service", {}).get("id") == sid and o.get("type") == "subscription" and o.get("link")), None)
+        if not opt:
+            continue  # sin enlace directo no lo enseñamos
+        items.append({"id": int(i), "type": "movie" if k == "movie" else "tv", "title": x.get("title"),
+                      "year": str(x.get("releaseYear") or x.get("firstAirYear") or ""),
+                      "poster": ps.get("w360") or ps.get("w240") or ps.get("w480"),
+                      "rating": round((x.get("rating") or 0) / 10, 1), "date": "", "link": opt["link"],
+                      "expires": opt.get("expiresOn")})
+    return {"items": items, "next": d.get("nextCursor") if d.get("hasMore") else None}
+
+
 def tmdb_providers(kind, tid):
     res = tmdb(f"/{kind}/{tid}/watch/providers").get("results", {}).get("ES", {})
     return res

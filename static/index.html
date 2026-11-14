@@ -51,6 +51,8 @@ nav button span{font-size:20px;line-height:1.1}nav button.on{background:var(--s2
 .up{display:flex;gap:12px;align-items:center;padding:10px;margin:8px 16px;cursor:pointer}.up img{width:56px;height:84px;object-fit:cover;border-radius:9px;flex:none;background:var(--s2)}.up b{display:block;line-height:1.25}
 .dt{flex:none;width:52px;text-align:center;font-weight:800;line-height:1.1}.dt small{display:block;color:var(--red);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
 select{background:var(--s2);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:9px;font-size:16px}
+.pill{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:16px;background:var(--s1);border:1px solid var(--ln);cursor:pointer;font-weight:650;font-size:14px;transition:transform .15s}.pill:active{transform:scale(.95)}
+.pill.mine{border-color:#ff8a5c;box-shadow:0 0 0 1px #ff8a5c66}.pill img{width:34px;height:34px;border-radius:9px;object-fit:cover;background:var(--s2)}.pill i{width:34px;height:34px;border-radius:9px;background:var(--s2);display:grid;place-items:center;font-style:normal}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(prefers-reduced-transparency:reduce){nav,header,.glass{backdrop-filter:none;background:#1a1530}}
 </style></head><body><div class="wrap">
@@ -75,6 +77,7 @@ function draw(){document.querySelectorAll("#nav button").forEach(b=>b.classList.
  const a=$("#app");
  if(S.q.length>=2&&S.tab=="inicio"){a.innerHTML=`<h2>Resultados <small>${S.res?S.res.length:""}</small></h2>`+(S.res===null?rail(null):S.res.err?`<p class="empty">${esc(S.res.err)}</p>`:S.res.length?`<div class="grid">${S.res.map(card).join("")}</div>`:'<p class="empty">Nada encontrado.</p>');return}
  if(S.tab=="inicio"){a.innerHTML=(S.favs.length?`<h2>Mis cines <small><a href="#" data-t="cines">ver</a></small></h2><div class="rail">${S.favs.map(c=>`<div class="glass" style="flex:0 0 190px;padding:12px"><b>${esc(c.name)}</b><br><small class="mut">${esc(c.address||"")}</small>${c.website?`<br><a class="ok" href="${esc(c.website)}" target="_blank" rel="noopener">Ver cartelera ↗</a>`:""}</div>`).join("")}</div>`:"")+
+  `<h2>Plataformas <small>qué hay en cada una</small></h2><div class="rail">${[...Object.keys(PLAT)].sort((a,b)=>S.mine.includes(b)-S.mine.includes(a)).map(k=>`<div class="pill ${S.mine.includes(k)?"mine":""}" data-pl="${k}">${logo(k)?`<img alt="" src="${logo(k)}" onerror="this.remove()">`:`<i>▶</i>`}${PLAT[k]}</div>`).join("")}</div>`+
   `<h2>En cartelera en España <small>cines</small></h2>${rail(S.np)}<h2>Tendencias esta semana</h2>${rail(S.tr)}`+(S.mine.length?"":`<div class="glass pad" style="margin:14px 16px;padding:14px"><b>Elige tus plataformas</b><br><span class="mut">Así te digo si cada título está en las tuyas.</span><br><br><button class="btn" data-t="mias">Elegir</button></div>`);
   load("np","/api/nowplaying");load("tr","/api/trending")}
  if(S.tab=="series"){a.innerHTML=`<h2>Series populares</h2>${rail(S.ser?S.ser.popular||S.ser:null)}<h2>En emisión ahora</h2>${rail(S.ser?S.ser.airing||S.ser:null)}`;load("ser","/api/series")}
@@ -88,6 +91,18 @@ const row=c=>`<div class="row glass"><div><b>${esc(c.name)}</b><br><small class=
 function cinesHtml(){return (S.cerr?`<p class="empty warn">${esc(S.cerr)}</p>`:"")+(S.favs.length?`<h2>Mis cines</h2>`+S.favs.map(row).join(""):"")+(S.cines?`<h2>Cercanos <small>${S.cines.length}</small></h2>`+(S.cines.length?S.cines.map(row).join(""):'<p class="empty">No he encontrado cines en 12 km.</p>'):"")}
 const opt=o=>`<div class="row glass"><div style="display:flex;align-items:center">${logo(o.service,o.logo)?`<img class="opl" alt="" src="${logo(o.service,o.logo)}" onerror="this.remove()">`:""}<div><b>${esc(o.name)}</b><br><small class="mut">${{subscription:"Suscripción",free:"Gratis",addon:"Complemento",rent:"Alquiler",buy:"Compra"}[o.type]||o.type}${o.quality?" · "+o.quality.toUpperCase():""}${o.price?" · "+esc(o.price):""}${o.expires?" · hasta "+new Date(o.expires*1000).toLocaleDateString("es"):""}</small></div></div><a class="btn go" href="${esc(o.link)}" target="_blank" rel="noopener">Ver ↗</a></div>`;
 const ratings=m=>{const r=m.ratings||{},p=[["TMDB",m.rating?m.rating+"/10":""],["IMDb",r.imdb?r.imdb+"/10":""],["Rotten Tomatoes",r.rt],["Metacritic",r.metacritic?r.metacritic+"/100":""]].filter(x=>x[1]);return p.length?`<div class="rt">${p.map(([n,v])=>`<div>${esc(v)}<small>${n}</small></div>`).join("")}</div>`:""};
+async function openPlatform(sid){const d=document.createElement("div");d.className="sheet";document.body.append(d);document.body.style.overflow="hidden";
+ const st={type:"all",order:"popularity_1week",items:[],next:null,err:"",busy:false};
+ const shut=()=>{d.classList.add("out");document.body.style.overflow="";setTimeout(()=>d.remove(),240)};
+ const seg=(key,opts)=>`<div class="seg">${opts.map(([v,t])=>`<span class="chip ${st[key]==v?"on":""}" data-${key}="${v}">${t}</span>`).join("")}</div>`;
+ const view=()=>{d.innerHTML=`<button class="close" aria-label="Cerrar">✕</button><div style="padding:calc(64px + env(safe-area-inset-top)) 16px 0;display:flex;align-items:center;gap:12px">${logo(sid)?`<img class="opl" alt="" src="${logo(sid)}">`:""}<div><h1 style="margin:0;font-size:26px;letter-spacing:-.03em">${PLAT[sid]}</h1><span class="mut" style="font-size:13px">Solo títulos con enlace directo verificado</span></div></div>`+
+  `<div style="height:12px"></div>`+seg("type",[["all","Todo"],["movie","Películas"],["tv","Series"]])+seg("order",[["popularity_1week","Populares"],["release_date","Novedades"],["rating","Mejor valoradas"]])+
+  (st.err?`<p class="empty warn">${esc(st.err)}</p>`:"")+(st.items.length?`<div class="grid" style="margin-top:8px">${st.items.map(card).join("")}</div>`:(st.busy?'<div class="rail">'+'<div class="sk"></div>'.repeat(4)+'</div>':st.err?"":'<p class="empty">Nada por aquí.</p>'))+
+  (st.next&&!st.busy?'<div class="pad" style="margin:18px 0 40px;text-align:center"><button class="btn g" data-more="1">Ver más</button></div>':'<div style="height:40px"></div>')};
+ const load=async more=>{st.busy=true;st.err="";if(!more){st.items=[];st.next=null}view();
+  try{const r=await api(`/api/platform/${sid}?type=${st.type}&order=${st.order}`+(more&&st.next?`&cursor=${encodeURIComponent(st.next)}`:""));st.items=st.items.concat(r.items);st.next=r.next}catch(e){st.err=e.message}st.busy=false;view()};
+ d.addEventListener("click",e=>{const t=e.target;if(t.closest(".close"))return shut();if(t.dataset.type){st.type=t.dataset.type;load(false)}else if(t.dataset.order){st.order=t.dataset.order;load(false)}else if(t.dataset.more)load(true)});
+ load(false)}
 async function openTitle(k,i){const d=document.createElement("div");d.className="sheet";d.innerHTML='<button class="close" aria-label="Cerrar">✕</button><div class="hero"></div><p class="empty">Comprobando enlaces reales…</p>';document.body.append(d);document.body.style.overflow="hidden";
  const shut=()=>{d.classList.add("out");document.body.style.overflow="";setTimeout(()=>d.remove(),240)};d.querySelector(".close").onclick=shut;
  try{const m=await api(`/api/title/${k}/${i}?mine=${S.mine.join(",")}`),v=m.availability;
@@ -101,8 +116,9 @@ async function openTitle(k,i){const d=document.createElement("div");d.className=
   (v.unconfirmed.length?`<h2 class="warn">Sin confirmar</h2><p class="pad mut" style="margin-top:0">Una fuente apunta a ${esc(v.unconfirmed.join(", "))}, pero sin enlace directo. No lo doy por bueno.</p>`:"")+`<h2>Sinopsis</h2><p class="pad">${esc(m.overview||"Sin sinopsis.")}</p><div style="height:40px"></div>`;
   d.querySelector(".close").onclick=shut;
  }catch(e){d.innerHTML+=`<p class="empty warn">${esc(e.message)}</p>`;d.querySelector(".close").onclick=shut}}
-document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-u]");if(!t)return;
+document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-u],[data-pl]");if(!t)return;
  if(t.dataset.t){e.preventDefault();S.tab=t.dataset.t;S.q="";$("#q").value="";draw();scrollTo(0,0)}
+ else if(t.dataset.pl){openPlatform(t.dataset.pl)}
  else if(t.dataset.u){S.upf=t.dataset.u;draw()}
  else if(t.classList.contains("card")||t.classList.contains("up"))openTitle(t.dataset.k,t.dataset.i);
  else if(t.dataset.p){const p=t.dataset.p;S.mine=S.mine.includes(p)?S.mine.filter(x=>x!=p):[...S.mine,p];sv("mine",S.mine);draw()}

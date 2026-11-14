@@ -33,6 +33,14 @@ def nowplaying():
     return cached("nowplaying:es", H6, sources.now_playing)
 
 
+@app.get("/api/platform/{sid}")
+def platform(sid: str, type: str = "all", order: str = "popularity_1week", cursor: str = ""):
+    if sid not in logic.ALIAS or type not in ("all", "movie", "tv") or order not in (
+            "popularity_1week", "popularity_1month", "release_date", "rating"):
+        raise HTTPException(400, "Parámetros no válidos")
+    return cached(f"plat:{sid}:{type}:{order}:{cursor}", H12, lambda: sources.platform_catalog(sid, type, order, cursor or None))
+
+
 @app.get("/api/series")
 def series():
     return {"popular": cached("tv:popular", H6, sources.popular_series), "airing": cached("tv:airing", H6, sources.airing_series)}
