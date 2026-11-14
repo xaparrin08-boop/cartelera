@@ -1,0 +1,115 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0a1c"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Cartelera</title>
+<link rel="manifest" href="/static/manifest.json"><link rel="icon" href="/static/logo.svg"><link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<style>
+:root{--bg:#0d0a1c;--s1:rgba(255,255,255,.07);--s2:rgba(255,255,255,.12);--ln:rgba(255,255,255,.14);--tx:#f4f2fa;--mut:#a6a1bd;--ok:#46e0a0;--warn:#ffb347;--red:#ff4d6a;--gold:#ffd166;--r:18px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;color:var(--tx);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;min-height:100vh;
+ background:radial-gradient(900px 500px at 85% -10%,#4b2a8a55,transparent 60%),radial-gradient(700px 500px at -10% 20%,#ff4d6a22,transparent 60%),var(--bg);background-attachment:fixed;
+ padding:0 0 calc(96px + env(safe-area-inset-bottom))}
+.wrap{max-width:900px;margin:0 auto}
+header{position:sticky;top:0;z-index:4;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:linear-gradient(var(--bg) 55%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);mask-image:linear-gradient(#000 80%,transparent);-webkit-mask-image:linear-gradient(#000 80%,transparent)}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}.brand img{width:38px;height:38px;border-radius:10px}
+.brand b{font-size:24px;letter-spacing:-.03em;font-weight:800}.brand b i{font-style:normal;color:var(--gold)}
+.search{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--ln);border-radius:14px;padding:0 14px;backdrop-filter:blur(20px)}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--tx);font-size:17px;padding:13px 0}.search input::placeholder{color:var(--mut)}
+section{padding:6px 0 4px}h2{margin:18px 16px 10px;font-size:20px;letter-spacing:-.02em;font-weight:750;display:flex;align-items:baseline;justify-content:space-between}
+h2 small{font-size:13px;color:var(--mut);font-weight:500}
+.rail{display:flex;gap:12px;overflow-x:auto;padding:2px 16px 10px;scroll-snap-type:x proximity;scroll-padding-left:16px;scrollbar-width:none}.rail::-webkit-scrollbar{display:none}
+.card{flex:0 0 132px;scroll-snap-align:start;cursor:pointer;transition:transform .18s cubic-bezier(.2,.9,.3,1.2)}.card:active{transform:scale(.96)}
+.card .p{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:var(--s1);box-shadow:0 8px 24px #0006}
+.card img{width:100%;height:100%;object-fit:cover;display:block}.card .t{margin-top:7px;font-size:13px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .y{font-size:12px;color:var(--mut)}.rate{position:absolute;left:6px;bottom:6px;background:#000a;backdrop-filter:blur(8px);border-radius:8px;padding:2px 7px;font-size:12px;font-weight:700;color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:14px;padding:0 16px}.grid .card{flex:none}
+.glass{background:var(--s1);border:1px solid var(--ln);border-radius:var(--r);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.pad{padding:0 16px}.mut{color:var(--mut)}.ok{color:var(--ok)}.warn{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:9px 14px;border-radius:99px;background:var(--s1);border:1px solid var(--ln);font-size:14px;font-weight:600;cursor:pointer;transition:transform .15s}
+.chip:active{transform:scale(.94)}.chip.on{background:linear-gradient(135deg,#ff4d6a,#ff8a5c);border-color:transparent;box-shadow:0 6px 18px #ff4d6a55}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;margin:8px 16px}.row b{font-weight:650}
+.btn{border:0;border-radius:12px;padding:10px 15px;font-size:15px;font-weight:650;color:#fff;background:linear-gradient(135deg,#ff4d6a,#ff8a5c);cursor:pointer;transition:transform .12s}.btn:active{transform:scale(.95)}
+.btn.g{background:var(--s2);border:1px solid var(--ln)}.btn.go{background:var(--ok);color:#06231a;text-decoration:none;display:inline-block}
+a{color:inherit}.star{font-size:22px;background:none;border:0;color:var(--gold);cursor:pointer}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));z-index:6;display:flex;gap:4px;padding:6px;border-radius:26px;background:#1a1530b3;border:1px solid var(--ln);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);box-shadow:0 14px 40px #000a;width:min(94vw,460px)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 6px;border:0;border-radius:20px;background:none;color:var(--mut);font-size:10.5px;font-weight:650;cursor:pointer;transition:all .2s}
+nav button span{font-size:20px;line-height:1.1}nav button.on{background:var(--s2);color:var(--tx)}
+.sheet{position:fixed;inset:0;z-index:20;overflow:auto;background:var(--bg);animation:up .38s cubic-bezier(.2,.9,.25,1.05)}
+.sheet.out{animation:down .26s ease-in forwards}@keyframes up{from{transform:translateY(100%)}}@keyframes down{to{transform:translateY(100%)}}
+.hero{position:relative;height:300px;background-size:cover;background-position:center top}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 30%,var(--bg))}
+.close{position:fixed;top:calc(12px + env(safe-area-inset-top));left:14px;z-index:22;width:40px;height:40px;border-radius:50%;border:1px solid var(--ln);background:#000a;color:#fff;font-size:20px;backdrop-filter:blur(12px)}
+.dh{margin:-70px 16px 0;position:relative;z-index:1}.dh h1{margin:0;font-size:30px;letter-spacing:-.03em;line-height:1.1}.meta{color:var(--mut);margin:6px 0 12px;font-size:14px}
+.verdict{margin:14px 16px;padding:16px;border-radius:var(--r);font-weight:700;font-size:17px}
+.verdict.y{background:linear-gradient(135deg,#46e0a033,#46e0a011);border:1px solid #46e0a066}.verdict.n{background:#ffb34720;border:1px solid #ffb34766}
+.empty{padding:30px 16px;text-align:center;color:var(--mut)}
+.sk{height:200px;border-radius:14px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s1));background-size:200% 100%;animation:sh 1.2s infinite;flex:0 0 132px}@keyframes sh{to{background-position:-200% 0}}
+.pl{width:22px;height:22px;border-radius:6px;object-fit:cover;vertical-align:middle;margin-right:8px}.chip .pl{margin-right:6px}.opl{width:42px;height:42px;border-radius:11px;object-fit:cover;margin-right:12px;flex:none;background:var(--s2)}
+.seg{display:flex;gap:6px;padding:0 16px 6px}.seg .chip{padding:7px 13px}
+.rt{display:flex;flex-wrap:wrap;gap:8px;margin:14px 16px 0}.rt div{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:7px 11px;font-weight:750;font-size:15px}.rt small{display:block;color:var(--mut);font-weight:500;font-size:11px}
+.up{display:flex;gap:12px;align-items:center;padding:10px;margin:8px 16px;cursor:pointer}.up img{width:56px;height:84px;object-fit:cover;border-radius:9px;flex:none;background:var(--s2)}.up b{display:block;line-height:1.25}
+.dt{flex:none;width:52px;text-align:center;font-weight:800;line-height:1.1}.dt small{display:block;color:var(--red);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+select{background:var(--s2);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:9px;font-size:16px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(prefers-reduced-transparency:reduce){nav,header,.glass{backdrop-filter:none;background:#1a1530}}
+</style></head><body><div class="wrap">
+<header><div class="brand"><img src="/static/logo.svg" alt=""><b>Cartel<i>era</i></b></div>
+<label class="search"><span>🔍</span><input id="q" type="search" placeholder="Busca una peli o serie…" autocomplete="off"></label></header>
+<main id="app"></main></div>
+<nav id="nav"><button data-t="inicio"><span>🍿</span>Inicio</button><button data-t="series"><span>📺</span>Series</button><button data-t="prox"><span>🗓️</span>Próximas</button><button data-t="cines"><span>📍</span>Cines</button><button data-t="mias"><span>👤</span>Tú</button></nav>
+<script>
+const PLAT={netflix:"Netflix",prime:"Prime Video",disney:"Disney+",hbo:"Max",apple:"Apple TV+",movistar:"Movistar+",filmin:"Filmin",skyshowtime:"SkyShowtime",paramount:"Paramount+",rakuten:"Rakuten TV",mubi:"MUBI"};
+const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const S={tab:"inicio",ser:null,up:null,upf:"all",logos:null,hours:ls("hours",[17,21]),mine:ls("mine",[]),favs:ls("favs",[]),q:"",res:null,tr:null,np:null,cines:null,cerr:""};
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const api=async u=>{const r=await fetch(u);if(!r.ok)throw new Error((await r.json().catch(()=>({}))).detail||("Error "+r.status));return r.json()};
+const card=m=>`<div class="card" data-k="${m.type}" data-i="${m.id}"><div class="p">${m.poster?`<img loading="lazy" alt="" src="${m.poster}">`:""}<span class="rate">★ ${m.rating}</span></div><div class="t">${esc(m.title)}</div><div class="y">${m.year||""} · ${m.type=="tv"?"Serie":"Peli"}</div></div>`;
+const logo=(id,u)=>u||(S.logos&&S.logos[id])||"";
+const lg=(id,cls="pl")=>{const u=logo(id);return u?`<img class="${cls}" alt="" src="${u}" onerror="this.remove()">`:""};
+const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],DIA=["dom","lun","mar","mié","jue","vie","sáb"];
+const upRow=m=>{const d=new Date(m.date+"T12:00:00");return `<div class="up glass" data-k="${m.type}" data-i="${m.id}"><div class="dt"><small>${DIA[d.getDay()]}</small><span style="font-size:24px">${d.getDate()}</span></div>${m.poster?`<img loading="lazy" alt="" src="${m.poster}">`:""}<div><b>${esc(m.title)}</b><span class="mut" style="font-size:13px">${m.type=="tv"?"Serie":"Película"}</span></div></div>`};
+const rail=l=>l===null?`<div class="rail">${'<div class="sk"></div>'.repeat(5)}</div>`:l.err?`<p class="empty">${esc(l.err)}</p>`:`<div class="rail">${l.map(card).join("")}</div>`;
+const busy={};const load=async(k,u)=>{if(S[k]||busy[k])return;busy[k]=1;try{S[k]=await api(u)}catch(e){S[k]=Object.assign([],{err:e.message})}busy[k]=0;draw()};
+function draw(){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t==S.tab));
+ const a=$("#app");
+ if(S.q.length>=2&&S.tab=="inicio"){a.innerHTML=`<h2>Resultados <small>${S.res?S.res.length:""}</small></h2>`+(S.res===null?rail(null):S.res.err?`<p class="empty">${esc(S.res.err)}</p>`:S.res.length?`<div class="grid">${S.res.map(card).join("")}</div>`:'<p class="empty">Nada encontrado.</p>');return}
+ if(S.tab=="inicio"){a.innerHTML=(S.favs.length?`<h2>Mis cines <small><a href="#" data-t="cines">ver</a></small></h2><div class="rail">${S.favs.map(c=>`<div class="glass" style="flex:0 0 190px;padding:12px"><b>${esc(c.name)}</b><br><small class="mut">${esc(c.address||"")}</small>${c.website?`<br><a class="ok" href="${esc(c.website)}" target="_blank" rel="noopener">Ver cartelera ↗</a>`:""}</div>`).join("")}</div>`:"")+
+  `<h2>En cartelera en España <small>cines</small></h2>${rail(S.np)}<h2>Tendencias esta semana</h2>${rail(S.tr)}`+(S.mine.length?"":`<div class="glass pad" style="margin:14px 16px;padding:14px"><b>Elige tus plataformas</b><br><span class="mut">Así te digo si cada título está en las tuyas.</span><br><br><button class="btn" data-t="mias">Elegir</button></div>`);
+  load("np","/api/nowplaying");load("tr","/api/trending")}
+ if(S.tab=="series"){a.innerHTML=`<h2>Series populares</h2>${rail(S.ser?S.ser.popular||S.ser:null)}<h2>En emisión ahora</h2>${rail(S.ser?S.ser.airing||S.ser:null)}`;load("ser","/api/series")}
+ if(S.tab=="prox"){load("up","/api/upcoming");const l=S.up&&!S.up.err?S.up.filter(m=>S.upf=="all"||m.type==S.upf):null;let h="",last="";
+  (l||[]).forEach(m=>{const d=new Date(m.date+"T12:00:00"),k=MES[d.getMonth()]+" "+d.getFullYear();if(k!=last){h+=`<h2 style="text-transform:capitalize">${k}</h2>`;last=k}h+=upRow(m)});
+  a.innerHTML=`<h2>Próximos estrenos <small>por fecha</small></h2><div class="seg">${[["all","Todo"],["movie","Películas"],["tv","Series"]].map(([k,v])=>`<span class="chip ${S.upf==k?"on":""}" data-u="${k}">${v}</span>`).join("")}</div>`+(S.up===null?rail(null):S.up.err?`<p class="empty">${esc(S.up.err)}</p>`:h||'<p class="empty">Sin estrenos.</p>')}
+ if(S.tab=="mias")a.innerHTML=`<h2>Mis plataformas</h2><p class="pad mut" style="margin-top:0">Marca las que tienes. Solo diré que algo está en ellas si hay enlace directo.</p><div class="chips pad">${Object.entries(PLAT).map(([k,v])=>`<span class="chip ${S.mine.includes(k)?"on":""}" data-p="${k}">${lg(k)}${v}</span>`).join("")}</div><h2>Mis horas de cine</h2><p class="pad mut" style="margin-top:0">Las sesiones se mostrarán solo dentro de este horario.</p><div class="pad" style="display:flex;gap:10px;align-items:center"><select id="h0">${hopt(S.hours[0])}</select> a <select id="h1">${hopt(S.hours[1])}</select></div>`;load("logos","/api/providers");
+ if(S.tab=="cines"){a.innerHTML=`<h2>Cines</h2><div class="pad"><button class="btn" id="loc">📍 Buscar cines cerca de mí</button> <small class="mut">usa tu ubicación solo para esta búsqueda</small><p class="mut" style="font-size:13px">Tu horario: ${S.hours[0]}:00–${S.hours[1]}:00 (cámbialo en Tú).</p></div><div id="cl">${cinesHtml()}</div>`}}
+const hopt=v=>Array.from({length:15},(_,i)=>i+9).map(h=>`<option value="${h}" ${h==v?"selected":""}>${h}:00</option>`).join("");
+const row=c=>`<div class="row glass"><div><b>${esc(c.name)}</b><br><small class="mut">${c.km!=null?c.km+" km · ":""}${esc(c.address||"")}</small>${c.website?`<br><a class="ok" href="${esc(c.website)}" target="_blank" rel="noopener">Ver cartelera ↗</a>`:""}</div><button class="star" data-f="${c.id}" aria-label="Fijar cine">${S.favs.some(x=>x.id==c.id)?"★":"☆"}</button></div>`;
+function cinesHtml(){return (S.cerr?`<p class="empty warn">${esc(S.cerr)}</p>`:"")+(S.favs.length?`<h2>Mis cines</h2>`+S.favs.map(row).join(""):"")+(S.cines?`<h2>Cercanos <small>${S.cines.length}</small></h2>`+(S.cines.length?S.cines.map(row).join(""):'<p class="empty">No he encontrado cines en 12 km.</p>'):"")}
+const opt=o=>`<div class="row glass"><div style="display:flex;align-items:center">${logo(o.service,o.logo)?`<img class="opl" alt="" src="${logo(o.service,o.logo)}" onerror="this.remove()">`:""}<div><b>${esc(o.name)}</b><br><small class="mut">${{subscription:"Suscripción",free:"Gratis",addon:"Complemento",rent:"Alquiler",buy:"Compra"}[o.type]||o.type}${o.quality?" · "+o.quality.toUpperCase():""}${o.price?" · "+esc(o.price):""}${o.expires?" · hasta "+new Date(o.expires*1000).toLocaleDateString("es"):""}</small></div></div><a class="btn go" href="${esc(o.link)}" target="_blank" rel="noopener">Ver ↗</a></div>`;
+const ratings=m=>{const r=m.ratings||{},p=[["TMDB",m.rating?m.rating+"/10":""],["IMDb",r.imdb?r.imdb+"/10":""],["Rotten Tomatoes",r.rt],["Metacritic",r.metacritic?r.metacritic+"/100":""]].filter(x=>x[1]);return p.length?`<div class="rt">${p.map(([n,v])=>`<div>${esc(v)}<small>${n}</small></div>`).join("")}</div>`:""};
+async function openTitle(k,i){const d=document.createElement("div");d.className="sheet";d.innerHTML='<button class="close" aria-label="Cerrar">✕</button><div class="hero"></div><p class="empty">Comprobando enlaces reales…</p>';document.body.append(d);document.body.style.overflow="hidden";
+ const shut=()=>{d.classList.add("out");document.body.style.overflow="";setTimeout(()=>d.remove(),240)};d.querySelector(".close").onclick=shut;
+ try{const m=await api(`/api/title/${k}/${i}?mine=${S.mine.join(",")}`),v=m.availability;
+  const yes=v.on_mine.length,any=v.on_mine.length+v.other_subscription.length;
+  const verdict=!v.verified?`<div class="verdict n">⚠ Ahora mismo no puedo verificar enlaces, así que no afirmo nada.</div>`:
+   yes?`<div class="verdict y">✔ Lo tienes en ${esc([...new Set(v.on_mine.map(o=>o.name))].join(", "))}<br><small class="mut" style="font-weight:500">Enlace directo verificado</small></div>`:
+   any?`<div class="verdict n">No está en tus plataformas, pero sí en otras de suscripción.</div>`:
+   v.rent_buy.length?`<div class="verdict n">No está en suscripción. Solo alquiler o compra.</div>`:`<div class="verdict n">No he encontrado ningún sitio con enlace directo para verla.</div>`;
+  d.innerHTML=`<button class="close" aria-label="Cerrar">✕</button><div class="hero" style="background-image:url(${m.backdrop||m.poster||""})"></div><div class="dh"><h1>${esc(m.title)}</h1><div class="meta">${m.year||""} · ${m.type=="tv"?"Serie":"Película"}${m.runtime?" · "+m.runtime+" min":""} · ★ ${m.rating}</div><div class="chips">${(m.genres||[]).map(g=>`<span class="chip">${esc(g)}</span>`).join("")}</div></div>${ratings(m)}${verdict}`+
+  (yes?`<h2>En tus plataformas</h2>${v.on_mine.map(opt).join("")}`:"")+(v.other_subscription.length?`<h2>Otras plataformas</h2>${v.other_subscription.map(opt).join("")}`:"")+(v.rent_buy.length?`<h2>Alquiler / compra</h2>${v.rent_buy.map(opt).join("")}`:"")+
+  (v.unconfirmed.length?`<h2 class="warn">Sin confirmar</h2><p class="pad mut" style="margin-top:0">Una fuente apunta a ${esc(v.unconfirmed.join(", "))}, pero sin enlace directo. No lo doy por bueno.</p>`:"")+`<h2>Sinopsis</h2><p class="pad">${esc(m.overview||"Sin sinopsis.")}</p><div style="height:40px"></div>`;
+  d.querySelector(".close").onclick=shut;
+ }catch(e){d.innerHTML+=`<p class="empty warn">${esc(e.message)}</p>`;d.querySelector(".close").onclick=shut}}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-u]");if(!t)return;
+ if(t.dataset.t){e.preventDefault();S.tab=t.dataset.t;S.q="";$("#q").value="";draw();scrollTo(0,0)}
+ else if(t.dataset.u){S.upf=t.dataset.u;draw()}
+ else if(t.classList.contains("card")||t.classList.contains("up"))openTitle(t.dataset.k,t.dataset.i);
+ else if(t.dataset.p){const p=t.dataset.p;S.mine=S.mine.includes(p)?S.mine.filter(x=>x!=p):[...S.mine,p];sv("mine",S.mine);draw()}
+ else if(t.dataset.f){const c=(S.cines||[]).concat(S.favs).find(x=>x.id==t.dataset.f);S.favs=S.favs.some(x=>x.id==c.id)?S.favs.filter(x=>x.id!=c.id):[...S.favs,c];sv("favs",S.favs);$("#cl").innerHTML=cinesHtml()}
+ else if(t.id=="loc"){t.textContent="Buscando…";S.cerr="";navigator.geolocation.getCurrentPosition(async p=>{try{S.cines=await api(`/api/cinemas?lat=${p.coords.latitude}&lon=${p.coords.longitude}&radius_km=12`)}catch(er){S.cerr=er.message}t.textContent="📍 Buscar cines cerca de mí";$("#cl").innerHTML=cinesHtml()},()=>{S.cerr="Sin permiso de ubicación. Actívalo en los ajustes del navegador.";t.textContent="📍 Buscar cines cerca de mí";$("#cl").innerHTML=cinesHtml()},{timeout:10000})}});
+document.addEventListener("change",e=>{if(e.target.id=="h0"||e.target.id=="h1"){let a=+$("#h0").value,b=+$("#h1").value;if(b<=a)b=Math.min(23,a+1);S.hours=[a,b];sv("hours",S.hours);draw()}});
+let tm,seq=0;$("#q").addEventListener("input",e=>{clearTimeout(tm);const q=S.q=e.target.value.trim();if(S.tab!="inicio"&&q){S.tab="inicio"}
+ if(q.length<2){S.res=null;draw();return}S.res=null;draw();const my=++seq;tm=setTimeout(async()=>{try{const r=await api("/api/search?q="+encodeURIComponent(q));if(my==seq)S.res=r}catch(er){if(my==seq)S.res=Object.assign([],{err:er.message})}if(my==seq)draw()},300)});
+draw();load("logos","/api/providers");
+</script></body></html>
