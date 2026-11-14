@@ -1,5 +1,6 @@
 """Fuentes externas: TMDB (fichas, cartelera), Streaming Availability (enlaces reales) y OpenStreetMap (cines)."""
 import os, requests
+from concurrent.futures import ThreadPoolExecutor
 
 TMDB = "https://api.themoviedb.org/3"
 IMG = "https://image.tmdb.org/t/p/"
@@ -23,7 +24,8 @@ def card(x, kind=None):
             "year": (x.get("release_date") or x.get("first_air_date") or "")[:4],
             "poster": IMG + "w342" + x["poster_path"] if x.get("poster_path") else None,
             "rating": round(x.get("vote_average") or 0, 1),
-            "date": x.get("release_date") or x.get("first_air_date") or ""}
+            "date": x.get("release_date") or x.get("first_air_date") or "",
+            "pop": round(x.get("popularity") or 0, 1), "votes": x.get("vote_count") or 0}
 
 
 def search(q):
@@ -32,10 +34,9 @@ def search(q):
 
 
 def now_playing():
-    out = []
-    for p in (1, 2):
-        out += tmdb("/movie/now_playing", region="ES", page=p).get("results", [])
-    return [card(x, "movie") for x in out]
+    with ThreadPoolExecutor(2) as ex:
+        pages = list(ex.map(lambda p: tmdb("/movie/now_playing", region="ES", page=p).get("results", []), (1, 2)))
+    return [card(x, "movie") for r in pages for x in r]
 
 
 def trending():
@@ -54,16 +55,21 @@ def upcoming(days=150):
     """Lo más esperado de los próximos meses (pelis y series), ordenado por fecha de estreno."""
     from datetime import date, timedelta
     a, b = date.today().isoformat(), (date.today() + timedelta(days=days)).isoformat()
-    out = []
-    for p in (1, 2, 3):
-        out += [card(x, "movie") for x in tmdb("/discover/movie", region="ES", sort_by="popularity.desc", page=p,
-                with_release_type="2|3", **{"primary_release_date.gte": a, "primary_release_date.lte": b}).get("results", [])]
-        out += [card(x, "tv") for x in tmdb("/discover/tv", sort_by="popularity.desc", page=p,
-                **{"first_air_date.gte": a, "first_air_date.lte": b}).get("results", [])]
+    def job(args):
+        kind, p = args
+        if kind == "movie":
+            r = tmdb("/discover/movie", region="ES", sort_by="popularity.desc", page=p, with_release_type="2|3",
+                     **{"primary_release_date.gte": a, "primary_release_date.lte": b})
+        else:
+            r = tmdb("/discover/tv", sort_by="popularity.desc", page=p,
+                     **{"first_air_date.gte": a, "first_air_date.lte": b})
+        return [card(x, kind) for x in r.get("results", [])]
+    with ThreadPoolExecutor(6) as ex:
+        out = [x for r in ex.map(job, [(k, p) for p in (1, 2, 3) for k in ("movie", "tv")]) for x in r]
     return sorted([x for x in out if x["date"] >= a and x["poster"]], key=lambda x: (x["date"], x["title"]))
 
 
-from logic import ALIAS  # noqa: E402
+from logic import ALIAS, SA_ORDER  # noqa: E402
 
 
 def provider_logos():
@@ -71,6 +77,39 @@ def provider_logos():
     items = tmdb("/watch/providers/movie", watch_region="ES").get("results", [])
     by = {i["provider_name"].lower(): i for i in items if i.get("logo_path")}
     return {sid: IMG + "w92" + by[n]["logo_path"] for sid, names in ALIAS.items() for n in names if n in by}
+
+
+def provider_ids():
+    """{id_plataforma: provider_id de TMDB} en España."""
+    items = tmdb("/watch/providers/movie", watch_region="ES").get("results", [])
+    by = {i["provider_name"].lower(): i["provider_id"] for i in items}
+    return {sid: by[n] for sid, names in ALIAS.items() for n in names if n in by}
+
+
+def tmdb_catalog(pid, kind="all", order="hype", page=1):
+    """Catálogo por TMDB (datos tipo JustWatch): NO verificado, sin enlace directo."""
+    from datetime import date
+    today = date.today().isoformat()
+    kinds = ["movie", "tv"] if kind == "all" else [kind]
+
+    def job(k):
+        sort = {"hype": "popularity.desc", "pop": "vote_count.desc", "rating": "vote_average.desc",
+                "new": "primary_release_date.desc" if k == "movie" else "first_air_date.desc"}[order]
+        p = {"watch_region": "ES", "with_watch_providers": pid, "with_watch_monetization_types": "flatrate",
+             "sort_by": sort, "page": page}
+        if order == "new":
+            p["primary_release_date.lte" if k == "movie" else "first_air_date.lte"] = today
+        if order == "rating":
+            p["vote_count.gte"] = 200
+        r = tmdb(f"/discover/{k}", **p)
+        return [card(x, k) for x in r.get("results", []) if x.get("poster_path")], r.get("total_pages", 1)
+    with ThreadPoolExecutor(2) as ex:
+        res = list(ex.map(job, kinds))
+    items = [x for r, _ in res for x in r]
+    key = {"hype": lambda x: -x["pop"], "pop": lambda x: -x["votes"], "rating": lambda x: -x["rating"], "new": lambda x: x["date"]}
+    items.sort(key=key[order], reverse=(order == "new"))
+    more = page < max(t for _, t in res) and page < 5
+    return {"items": items, "next": str(page + 1) if more else None, "verified": False}
 
 
 def omdb(imdb_id):
@@ -189,13 +228,13 @@ def services():
     return out
 
 
-def platform_catalog(sid, kind="all", order="popularity_1week", cursor=None):
+def platform_catalog(sid, kind="all", order="hype", cursor=None):
     """Catálogo de una plataforma en España, con enlace directo en cada título."""
     key = os.environ.get("RAPIDAPI_KEY", "")
     if not key:
         raise RuntimeError("Falta RAPIDAPI_KEY")
     base, h = _sa_base_headers(key)
-    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": order, "order_direction": "desc",
+    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": SA_ORDER.get(order, "popularity_1month"), "order_direction": "desc",
          "series_granularity": "show", "output_language": "es"}
     if kind in ("movie", "tv"):
         p["show_type"] = "movie" if kind == "movie" else "series"
@@ -221,7 +260,7 @@ def platform_catalog(sid, kind="all", order="popularity_1week", cursor=None):
                       "poster": ps.get("w360") or ps.get("w240") or ps.get("w480"),
                       "rating": round((x.get("rating") or 0) / 10, 1), "date": "", "link": opt["link"],
                       "expires": opt.get("expiresOn")})
-    return {"items": items, "next": d.get("nextCursor") if d.get("hasMore") else None}
+    return {"items": items, "next": d.get("nextCursor") if d.get("hasMore") else None, "verified": True}
 
 
 def tmdb_providers(kind, tid):

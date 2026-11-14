@@ -12,6 +12,11 @@ ALIAS = {"netflix": ["netflix"], "prime": ["amazon prime video", "prime video"],
          "rakuten": ["rakuten tv"], "mubi": ["mubi"], "crunchyroll": ["crunchyroll"], "plutotv": ["pluto tv"]}
 
 
+# Plataformas que la API de enlaces cubre en España. El resto (Movistar+, Filmin, Rakuten, Paramount+) va por TMDB, sin verificar.
+COVERED = {"netflix", "prime", "disney", "hbo", "apple", "mubi", "skyshowtime", "crunchyroll", "plutotv"}
+SA_ORDER = {"hype": "popularity_1day", "pop": "popularity_1month", "new": "release_date", "rating": "rating"}
+
+
 def canon(name):
     """Id de plataforma al que corresponde un nombre de TMDB (incluye variantes: with Ads, Amazon Channel...)."""
     n = name.lower().strip()

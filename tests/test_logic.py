@@ -125,3 +125,19 @@ def test_catalogo_solo_con_enlace(monkeypatch):
     monkeypatch.setattr(sources.requests, "get", lambda *a, **k: R())
     r = sources.platform_catalog("netflix")
     assert [i["id"] for i in r["items"]] == [1] and r["items"][0]["rating"] == 8.5 and r["next"] == "abc"
+
+
+def test_catalogo_tmdb_sin_verificar_y_ordenado(monkeypatch):
+    def fake(path, **k):
+        kind = path.rsplit("/", 1)[1]
+        mk = lambda i, pop: {"id": i, "title": f"{kind}{i}", "name": f"{kind}{i}", "poster_path": "/p", "popularity": pop,
+                             "release_date": "2026-01-01", "first_air_date": "2026-01-01", "vote_count": 5}
+        return {"results": [mk(1, 10), mk(2, 99)] if kind == "movie" else [mk(3, 50)], "total_pages": 3}
+    monkeypatch.setattr(sources, "tmdb", fake)
+    r = sources.tmdb_catalog(149, "all", "hype", 1)
+    assert r["verified"] is False and [i["id"] for i in r["items"]] == [2, 3, 1] and r["next"] == "2"
+
+
+def test_orden_sa():
+    assert logic.SA_ORDER["hype"] == "popularity_1day" and logic.SA_ORDER["new"] == "release_date"
+    assert "movistar" not in logic.COVERED and "netflix" in logic.COVERED

@@ -11,6 +11,7 @@ def _h():
 
 
 def get(key: str, ttl_s: int):
+    """ttl_s muy grande = aceptar valores caducados (si la fuente falla)."""
     hit = _mem.get(key)
     if hit and time.time() - hit[0] < ttl_s:
         return hit[1]
