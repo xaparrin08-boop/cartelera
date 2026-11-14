@@ -9,7 +9,7 @@ LABELS = {"netflix": "Netflix", "prime": "Prime Video", "disney": "Disney+", "hb
 ALIAS = {"netflix": ["netflix"], "prime": ["amazon prime video", "prime video"], "disney": ["disney plus", "disney+"],
          "hbo": ["max", "hbo max"], "apple": ["apple tv plus", "apple tv+", "apple tv"], "movistar": ["movistar plus+", "movistar plus"],
          "filmin": ["filmin"], "skyshowtime": ["skyshowtime"], "paramount": ["paramount plus", "paramount+"],
-         "rakuten": ["rakuten tv"], "mubi": ["mubi"]}
+         "rakuten": ["rakuten tv"], "mubi": ["mubi"], "crunchyroll": ["crunchyroll"], "plutotv": ["pluto tv"]}
 
 
 def canon(name):
