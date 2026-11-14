@@ -139,5 +139,5 @@ def test_catalogo_tmdb_sin_verificar_y_ordenado(monkeypatch):
 
 
 def test_orden_sa():
-    assert logic.SA_ORDER["hype"] == "popularity_1day" and logic.SA_ORDER["new"] == "release_date"
+    assert logic.SA_ORDER["hype"] == "popularity_1week" and logic.SA_ORDER["new"] == "release_date"
     assert "movistar" not in logic.COVERED and "netflix" in logic.COVERED

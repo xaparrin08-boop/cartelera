@@ -8,13 +8,13 @@ LABELS = {"netflix": "Netflix", "prime": "Prime Video", "disney": "Disney+", "hb
 
 ALIAS = {"netflix": ["netflix"], "prime": ["amazon prime video", "prime video"], "disney": ["disney plus", "disney+"],
          "hbo": ["max", "hbo max"], "apple": ["apple tv plus", "apple tv+", "apple tv"], "movistar": ["movistar plus+", "movistar plus"],
-         "filmin": ["filmin"], "skyshowtime": ["skyshowtime"], "paramount": ["paramount plus", "paramount+"],
+         "filmin": ["filmin"], "skyshowtime": ["skyshowtime"],
          "rakuten": ["rakuten tv"], "mubi": ["mubi"], "crunchyroll": ["crunchyroll"], "plutotv": ["pluto tv"]}
 
 
 # Plataformas que la API de enlaces cubre en España. El resto (Movistar+, Filmin, Rakuten, Paramount+) va por TMDB, sin verificar.
 COVERED = {"netflix", "prime", "disney", "hbo", "apple", "mubi", "skyshowtime", "crunchyroll", "plutotv"}
-SA_ORDER = {"hype": "popularity_1day", "pop": "popularity_1month", "new": "release_date", "rating": "rating"}
+SA_ORDER = {"hype": "popularity_1week", "pop": "popularity_1year", "new": "release_date", "rate": "rating"}
 
 
 def canon(name):

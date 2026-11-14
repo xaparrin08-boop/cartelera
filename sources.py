@@ -93,20 +93,20 @@ def tmdb_catalog(pid, kind="all", order="hype", page=1):
     kinds = ["movie", "tv"] if kind == "all" else [kind]
 
     def job(k):
-        sort = {"hype": "popularity.desc", "pop": "vote_count.desc", "rating": "vote_average.desc",
+        sort = {"hype": "popularity.desc", "pop": "vote_count.desc", "rate": "vote_average.desc",
                 "new": "primary_release_date.desc" if k == "movie" else "first_air_date.desc"}[order]
         p = {"watch_region": "ES", "with_watch_providers": pid, "with_watch_monetization_types": "flatrate",
              "sort_by": sort, "page": page}
         if order == "new":
             p["primary_release_date.lte" if k == "movie" else "first_air_date.lte"] = today
-        if order == "rating":
+        if order == "rate":
             p["vote_count.gte"] = 200
         r = tmdb(f"/discover/{k}", **p)
         return [card(x, k) for x in r.get("results", []) if x.get("poster_path")], r.get("total_pages", 1)
     with ThreadPoolExecutor(2) as ex:
         res = list(ex.map(job, kinds))
     items = [x for r, _ in res for x in r]
-    key = {"hype": lambda x: -x["pop"], "pop": lambda x: -x["votes"], "rating": lambda x: -x["rating"], "new": lambda x: x["date"]}
+    key = {"hype": lambda x: -x["pop"], "pop": lambda x: -x["votes"], "rate": lambda x: -x["rating"], "new": lambda x: x["date"]}
     items.sort(key=key[order], reverse=(order == "new"))
     more = page < max(t for _, t in res) and page < 5
     return {"items": items, "next": str(page + 1) if more else None, "verified": False}
@@ -234,7 +234,7 @@ def platform_catalog(sid, kind="all", order="hype", cursor=None):
     if not key:
         raise RuntimeError("Falta RAPIDAPI_KEY")
     base, h = _sa_base_headers(key)
-    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": SA_ORDER.get(order, "popularity_1month"), "order_direction": "desc",
+    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": SA_ORDER.get(order, "popularity_1week"), "order_direction": "desc",
          "series_granularity": "show", "output_language": "es"}
     if kind in ("movie", "tv"):
         p["show_type"] = "movie" if kind == "movie" else "series"
