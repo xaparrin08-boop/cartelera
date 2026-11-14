@@ -70,7 +70,14 @@ select{color:var(--tx);border-radius:14px;padding:10px 12px;font-size:16px;borde
 .up{display:flex;gap:13px;align-items:center;padding:11px 13px;margin:9px 16px;border-radius:22px}.up img{width:58px;height:87px;object-fit:cover;border-radius:12px;flex:none;background:rgba(255,255,255,.08)}
 .up b{display:block;line-height:1.25;font-weight:680}.dt{flex:none;width:50px;text-align:center;font-weight:800;line-height:1.05}.dt small{display:block;color:var(--a2);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 
-/* ===== Dock ===== */
+.on{position:absolute;right:6px;bottom:6px;display:flex;gap:3px}.on img{width:21px;height:21px;border-radius:7px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.35)}
+.unv{position:absolute;top:7px;right:7px;border-radius:9px;padding:1px 8px;font-size:13px;font-weight:800;color:var(--warn)}
+.cb{margin:10px 16px;padding:14px;border-radius:24px}.cbh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.cbh small{color:var(--mut)}
+.mv{display:flex;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.1)}.mvp{flex:0 0 58px;height:87px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.08)}.mvp img{width:100%;height:100%;object-fit:cover;display:block}
+.mvb{min-width:0;flex:1}.mvb>b{display:block;font-weight:700;line-height:1.25;margin-bottom:5px}.vs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:3px 0}.vs small{color:var(--mut);font-size:12px;min-width:56px}
+.tm{display:inline-flex;align-items:baseline;gap:5px;padding:6px 11px;border-radius:12px;background:rgba(255,255,255,.1);color:var(--tx);text-decoration:none;font-weight:750;font-size:14px;border:1px solid rgba(255,255,255,.14)}
+.tm.win{background:linear-gradient(150deg,rgba(60,214,160,.55),rgba(40,170,130,.32));border-color:rgba(170,255,220,.5)}.tm i{font-style:normal;font-weight:600;font-size:10px;color:var(--mut)}
+/* ===== Dock =====
 .dock{background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(12,10,28,.5);position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(94vw,480px);display:grid;grid-template-columns:repeat(5,1fr);padding:6px;border-radius:32px;z-index:30}
 .dock .ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/5);border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.35);transition:transform .55s var(--spring)}
 .dock button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 2px 8px;border:0;background:none;color:var(--mut);font-size:10.5px;font-weight:700;transition:color .25s,transform .45s var(--spring)}
@@ -97,15 +104,15 @@ select{color:var(--tx);border-radius:14px;padding:10px 12px;font-size:16px;borde
 <label class="search glass" id="sb"><span>🔍</span><input id="q" type="search" enterkeyhint="search" placeholder="Busca una peli o serie…" autocomplete="off"><button class="x" id="qx" aria-label="Borrar">✕</button></label></header>
 <main id="app"></main></div>
 <nav class="dock glass" id="dock"><i class="ind" id="ind"></i>
-<button data-t="inicio"><span>🍿</span>Inicio</button><button data-t="series"><span>📺</span>Series</button><button data-t="prox"><span>🗓️</span>Próximas</button><button data-t="cines"><span>📍</span>Cines</button><button data-t="tu"><span>👤</span>Tú</button></nav>
+<button data-t="inicio"><span>🍿</span>Inicio</button><button data-t="peli"><span>🎬</span>Películas</button><button data-t="series"><span>📺</span>Series</button><button data-t="cines"><span>📍</span>Cines</button><button data-t="tu"><span>👤</span>Tú</button></nav>
 <script>
 "use strict";
 /* ---------- datos fijos ---------- */
 const PLAT={netflix:"Netflix",prime:"Prime Video",disney:"Disney+",hbo:"Max",apple:"Apple TV",movistar:"Movistar+",skyshowtime:"SkyShowtime",filmin:"Filmin",mubi:"MUBI",crunchyroll:"Crunchyroll",plutotv:"Pluto TV",rakuten:"Rakuten TV"};
 const COVERED=new Set(["netflix","prime","disney","hbo","apple","mubi","skyshowtime","crunchyroll","plutotv"]);
-const PRESETS=[{id:"p-quad",name:"O-Cine Quadernillos",address:"Alcalá de Henares",website:"https://tickets.ocinequadernillos.es/"},{id:"p-yelmo",name:"Yelmo Parque Corredor",address:"Torrejón de Ardoz",website:"https://www.cineyelmo.com/es"}];
+const PRESETS=[{id:"p-quad",code:"G01LE",short:"Quadernillos",name:"O-Cine Quadernillos",address:"Alcalá de Henares",website:"https://tickets.ocinequadernillos.es/"},{id:"p-yelmo",code:"E0291",short:"Parque Corredor",name:"Yelmo Parque Corredor",address:"Torrejón de Ardoz",website:"https://www.cineyelmo.com/es"}];
 const SORTS={hype:["🔥 Más hype",m=>-m.pop],pop:["⭐ Populares",m=>-m.votes],new:["🆕 Recién estrenadas",m=>m.date,1],rate:["🏆 Mejor valoradas",m=>-m.rating]};
-const TABS=["inicio","series","prox","cines","tu"];
+const TABS=["inicio","peli","series","cines","tu"];
 const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],DIA=["dom","lun","mar","mié","jue","vie","sáb"];
 /* ---------- utilidades ---------- */
 const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
@@ -118,11 +125,11 @@ async function swr(u,apply){const k="c:"+u;let had=false;const c=ls(k,null);if(c
 const L=x=>Array.isArray(x)?x:Object.assign([],{err:(x&&x.error)||"No disponible ahora mismo"});
 const sortBy=(l,m)=>{if(!l||l.err||!SORTS[m])return l;const[,f,desc]=SORTS[m];return[...l].sort((a,b)=>{const x=f(a),y=f(b);return(x<y?-1:x>y?1:0)*(desc?-1:1)})};
 /* ---------- estado ---------- */
-const S={tab:TABS.includes(ls("tab","inicio"))?ls("tab","inicio"):"inicio",mine:ls("mine",[]),favs:ls("favs",null)||PRESETS,hours:ls("hours",[17,21]),
+const S={tab:TABS.includes(ls("tab","inicio"))?ls("tab","inicio"):"inicio",mine:ls("mine",[]),favs:(ls("favs",null)||PRESETS).map(f=>PRESETS.find(p=>p.id==f.id)||f),fsel:ls("fsel",null),br:{},sh:{},shErr:{},shAt:{},showAll:false,hours:ls("hours",[17,21]),
  sort:ls("sort","hype"),usort:"date",upf:"all",q:"",res:null,np:null,tr:null,ser:null,up:null,logos:{},cines:null,cerr:""};
 const logo=(id,u)=>u||S.logos[id]||"";
 /* ---------- piezas ---------- */
-const card=(m,i=9)=>`<div class="card press" data-k="${m.type}" data-i="${m.id}"><div class="p">${m.poster?`<img ${i<4?'fetchpriority="high"':'loading="lazy"'} decoding="async" alt="" src="${esc(m.poster)}">`:""}<span class="rate glass lite">★ ${m.rating||"–"}</span></div><div class="t">${esc(m.title)}</div><div class="y">${m.year||""} · ${m.type=="tv"?"Serie":"Peli"}</div></div>`;
+const card=(m,i=9,sub)=>`<div class="card press" data-k="${m.type}" data-i="${m.id}"><div class="p">${m.poster?`<img ${i<4?'fetchpriority="high"':'loading="lazy"'} decoding="async" alt="" src="${esc(m.poster)}">`:""}<span class="rate glass lite">★ ${m.rating||"–"}</span>${m.verified===false?'<span class="unv glass lite" title="Sin enlace verificado">≈</span>':""}${m.on&&m.on.length?`<span class="on">${m.on.slice(0,3).map(k=>logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:"").join("")}</span>`:""}</div><div class="t">${esc(m.title)}</div><div class="y">${sub||`${m.year||""} · ${m.type=="tv"?"Serie":"Peli"}`}</div></div>`;
 const rail=l=>l==null?`<div class="rail">${'<div class="sk"></div>'.repeat(5)}</div>`:l.err?`<p class="empty">${esc(l.err)}<br><br><button class="btn glass tint press" data-retry="1">Reintentar</button></p>`:`<div class="rail">${l.map((m,i)=>card(m,i)).join("")}</div>`;
 const sortbar=(cur,modes=Object.keys(SORTS),attr="sort")=>`<div class="seg">${modes.map(k=>`<span class="chip glass press ${cur==k?"tint":""}" data-${attr}="${k}">${SORTS[k]?SORTS[k][0]:"Relevancia"}</span>`).join("")}</div>`;
 const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,t])=>`<span class="chip glass press ${cur==v?"tint":""}" data-${attr}="${v}">${t}</span>`).join("")}</div>`;
@@ -132,18 +139,71 @@ const upRow=m=>{const d=new Date(m.date+"T12:00:00");return`<div class="up glass
 const cineRow=c=>`<div class="row glass lite"><div><b>${esc(c.name)}</b><br><small>${c.km!=null?c.km+" km · ":""}${esc(c.address||"")}</small></div><div style="display:flex;align-items:center;gap:4px">${c.website?`<a class="btn glass tint press" href="${esc(c.website)}" target="_blank" rel="noopener">Cartelera ↗</a>`:""}<button class="star press" data-f="${esc(c.id)}" aria-label="Fijar">${S.favs.some(x=>x.id==c.id)?"★":"☆"}</button></div></div>`;
 const sortRes=r=>{const m=S.rsort||"rel";return m=="rel"?r:sortBy(r,m)};
 /* ---------- vistas ---------- */
-function render(){const a=$("#app");TABS.forEach(t=>{document.querySelector(`#dock [data-t=${t}]`).classList.toggle("on",t==S.tab)});$("#ind").style.transform=`translateX(${TABS.indexOf(S.tab)*100}%)`;
- if(S.q.length>=2){const r=S.res;a.innerHTML=`<h2>Resultados <small>${r&&!r.err?r.length:""}</small></h2>`+(r==null?rail(null):r.err?`<p class="empty">${esc(r.err)}</p>`:r.length?`${sortbar(S.rsort||"rel",["rel",...Object.keys(SORTS)],"rsort")}<div class="grid">${sortRes(r).map((m,i)=>card(m,i)).join("")}</div>`:'<p class="empty">No he encontrado nada.</p>');return}
- if(S.tab=="inicio")a.innerHTML=`<h2>Plataformas <small>qué hay en cada una</small></h2><div class="rail">${Object.keys(PLAT).sort((a,b)=>S.mine.includes(b)-S.mine.includes(a)).map(pill).join("")}</div>`+
-  `<h2>En cartelera <small>cines de España</small></h2>${sortbar(S.sort)}${rail(sortBy(S.np,S.sort))}<h2>Tendencias <small>esta semana</small></h2>${rail(S.tr)}`+
-  (S.favs.length?`<h2>Mis cines <small><a data-t="cines" href="#" style="color:inherit">ver</a></small></h2>${S.favs.map(cineRow).join("")}`:"")+
-  (S.mine.length?"":`<div class="glass note"><b>Elige tus plataformas</b><br><span class="mut">Así te digo si cada título está en las tuyas.</span><br><br><button class="btn glass tint press" data-t="tu">Elegir</button></div>`);
- else if(S.tab=="series"){const s=S.ser;a.innerHTML=`<h2>Series</h2>${sortbar(S.sort)}<h2>Populares ahora</h2>${rail(sortBy(s&&L(s.popular),S.sort))}<h2>En emisión</h2>${rail(sortBy(s&&L(s.airing),S.sort))}`}
- else if(S.tab=="prox"){const up=S.up,l=up&&!up.err?up.filter(m=>S.upf=="all"||m.type==S.upf):null;let h="";
-  if(l){const o=S.usort=="hype"?[...l].sort((a,b)=>b.pop-a.pop):l;if(S.usort=="date"){let last="";o.forEach(m=>{const d=new Date(m.date+"T12:00:00"),k=MES[d.getMonth()]+" "+d.getFullYear();if(k!=last){h+=`<h2 style="text-transform:capitalize">${k}</h2>`;last=k}h+=upRow(m)})}else h=o.map(upRow).join("")}
-  a.innerHTML=`<h2>Próximos estrenos</h2>${seg("upf",S.upf,[["all","Todo"],["movie","Películas"],["tv","Series"]])}${seg("usort",S.usort,[["date","📅 Por fecha"],["hype","🔥 Más hype"]])}`+(up==null?rail(null):up.err?`<p class="empty">${esc(up.err)}</p>`:h||'<p class="empty">Sin estrenos.</p>')}
- else if(S.tab=="cines")a.innerHTML=`<h2>Mis cines</h2>${S.favs.length?S.favs.map(cineRow).join(""):'<p class="empty">Pulsa ☆ en un cine para fijarlo.</p>'}<div class="glass note">⏰ Tu horario de cine: <b>${S.hours[0]}:00–${S.hours[1]}:00</b>. Cuando haya sesiones por cine, solo verás las de esas horas.</div><h2>Cines cerca de mí</h2><div class="pad"><button class="btn glass tint press" id="loc">📍 Buscar cines cercanos</button></div>${S.cerr?`<p class="empty warn">${esc(S.cerr)}</p>`:""}${S.cines?(S.cines.length?S.cines.map(cineRow).join(""):'<p class="empty">No he encontrado cines en 12 km.</p>'):""}`;
- else a.innerHTML=`<h2>Mis plataformas</h2><p class="pad mut" style="margin:-4px 0 12px">Marca las que tienes. Con las marcadas con <b class="warn">≈</b> (Movistar+, Filmin, Rakuten) no puedo verificar enlaces: te diré "posible", nunca "seguro".</p><div class="chips pad">${Object.entries(PLAT).map(([k,v])=>`<span class="chip glass press ${S.mine.includes(k)?"tint":""}" data-p="${k}">${logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:""}${v}${COVERED.has(k)?"":" ≈"}</span>`).join("")}</div><h2>Mis horas de cine</h2><div class="pad" style="display:flex;gap:10px;align-items:center"><select id="h0">${hopt(S.hours[0])}</select> a <select id="h1">${hopt(S.hours[1])}</select></div>`}
+const effSel=()=>S.fsel===null?S.mine:S.fsel;
+const BR=k=>S.br[k]||(S.br[k]={order:"hype",items:[],next:null,busy:false,err:"",seq:0,loaded:false});
+const nowHM=()=>{const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const inWin=t=>{const h=+t.slice(0,2)+ +t.slice(3)/60;return h>=S.hours[0]&&h<=S.hours[1]};
+/* sesiones de un cine ya filtradas: no empezadas y (salvo "todo el día") dentro de mis horas */
+function sessions(d,all){if(!d||!d.movies)return[];const today=d.date==todayStr(),now=nowHM();
+ return d.movies.map(m=>({...m,versions:m.versions.map(v=>({...v,times:v.times.filter(t=>(!today||t.t>=now)&&(all||inWin(t.t)))})).filter(v=>v.times.length)})).filter(m=>m.versions.length)}
+const myCines=()=>S.favs.filter(c=>c.code);
+const brChips=()=>{const sel=effSel(),allOn=S.fsel!==null?S.fsel.length==0:!S.mine.length,mineOn=S.fsel===null&&S.mine.length>0;
+ return `<div class="seg"><span class="chip glass press ${mineOn?"tint":""}" data-bp="__mine">👤 Mis plataformas</span><span class="chip glass press ${allOn?"tint":""}" data-bp="__all">Todas</span>${Object.entries(PLAT).map(([k,v])=>`<span class="chip glass press ${sel.includes(k)&&!allOn?"tint":""}" data-bp="${k}">${logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:""}${v}${COVERED.has(k)?"":" ≈"}</span>`).join("")}</div>`};
+function viewBrowse(kind){const b=BR(kind),tv=kind=="tv",sel=effSel(),unv=sel.filter(x=>!COVERED.has(x));
+ return `<h2>${tv?"Series":"Películas"} <small>${sel.length?sel.length+(sel.length>1?" plataformas":" plataforma"):"todas las plataformas"}</small></h2>${brChips()}`+
+ `<div class="seg">${["hype","pop","new","rate"].map(k=>`<span class="chip glass press ${b.order==k?"tint":""}" data-bo="${k}">${SORTS[k][0]}</span>`).join("")}</div>`+
+ (!S.mine.length&&S.fsel===null?`<div class="glass note">Mostrando todas las plataformas. <a data-t="tu" href="#" class="ok">Marca las tuyas</a> para ver solo lo que tienes.</div>`:"")+
+ (unv.length?`<div class="glass tint warn note">≈ <b>${unv.map(x=>PLAT[x]).join(", ")}</b>: datos de TMDB, sin enlace directo. Puede haber títulos que ya no estén.</div>`:`<div class="glass note ok">✔ Solo títulos con enlace directo verificado.</div>`)+
+ (b.err?`<p class="empty warn">${esc(b.err)}<br><br><button class="btn glass tint press" data-bretry="${kind}">Reintentar</button></p>`:"")+
+ (b.items.length?`<div class="grid">${b.items.map((m,i)=>card(m,i)).join("")}</div>`:(b.busy?`<div class="rail">${'<div class="sk"></div>'.repeat(4)}</div>`:b.err?"":'<p class="empty">Nada con esos filtros.</p>'))+
+ (b.next?`<div id="more" class="pad" style="margin:20px 0;text-align:center"><button class="btn glass press" data-bm="${kind}">${b.busy?"Cargando…":"Ver más"}</button></div>`:"")}
+async function loadBrowse(kind,more){const b=BR(kind);if(more&&(b.busy||!b.next))return;const my=++b.seq;b.busy=true;b.err="";b.loaded=true;if(!more){b.items=[];b.next=null}render();
+ try{const r=await api(`/api/browse?type=${kind}&platforms=${effSel().join(",")}&order=${b.order}`+(more&&b.next?`&cursor=${encodeURIComponent(b.next)}`:""));if(my!=b.seq)return;
+  const seen=new Set(b.items.map(x=>x.type+x.id));b.items=b.items.concat(r.items.filter(x=>!seen.has(x.type+x.id)));b.next=r.next}catch(e){if(my==b.seq)b.err=e.message}
+ if(my==b.seq){b.busy=false;render()}}
+const resetBrowse=()=>{["movie","tv"].forEach(k=>{const b=BR(k);b.items=[];b.next=null;b.loaded=false;b.seq++})};
+/* ---- cines ---- */
+const timeChip=(t,c)=>`<a class="tm ${inWin(t.t)?"win":""}" href="${esc(c.website||"#")}" target="_blank" rel="noopener">${t.t}${t.fmt.length?`<i>${esc(t.fmt.join("·"))}</i>`:""}</a>`;
+const movieRow=(m,c)=>`<div class="mv"><div class="mvp ${m.id?"press":""}" ${m.id?`data-k="movie" data-i="${m.id}"`:""}>${m.poster?`<img loading="lazy" decoding="async" alt="" src="${esc(m.poster)}">`:""}</div><div class="mvb"><b ${m.id?`class="press" data-k="movie" data-i="${m.id}"`:""}>${esc(m.title)}</b>${m.versions.map(v=>`<div class="vs"><small>${esc(v.label||"")}</small>${v.times.map(t=>timeChip(t,c)).join("")}</div>`).join("")}</div></div>`;
+function cineBox(c){const d=S.sh[c.code],err=S.shErr[c.code],all=S.showAll,l=d?sessions(d,all):[],stale=d&&d.date&&d.date!=todayStr();
+ return `<div class="cb glass lite"><div class="cbh"><div><b>${esc(c.name)}</b><br><small>${esc(c.address||"")}</small></div>${c.website?`<a class="btn glass tint press" href="${esc(c.website)}" target="_blank" rel="noopener">Entradas ↗</a>`:""}</div>`+
+ (stale?`<p class="mut" style="margin:6px 0;font-size:13px">Horarios del ${esc(d.date)}: actualizando…</p>`:"")+
+ (d?(l.length?l.map(m=>movieRow(m,c)).join(""):`<p class="empty" style="padding:18px 8px">${all?"Ya no quedan sesiones hoy.":`Nada entre ${S.hours[0]}:00 y ${S.hours[1]}:00 hoy.`}${all?"":`<br><br><button class="btn glass press" data-sh="all">Ver todo el día</button>`}</p>`):(err?`<p class="empty warn" style="padding:18px 8px">${esc(err)}</p>`:'<div class="rail" style="padding:10px 0"><div class="sk" style="flex-basis:90px;height:130px"></div><div class="sk" style="flex-basis:90px;height:130px"></div></div>'))+
+ (d?`<p class="mut" style="margin:10px 4px 0;font-size:12px">Horarios de hoy · fuente <a class="ok" href="${esc(d.url)}" target="_blank" rel="noopener">Sensacine ↗</a></p>`:"")+`</div>`}
+function loadShow(code,force){const now=Date.now();if(!force&&S.shAt[code]&&now-S.shAt[code]<600000)return;S.shAt[code]=now;
+ swr(`/api/showtimes/${code}`,(d,stale,err)=>{if(d){S.sh[code]=d;S.shErr[code]=""}else if(!S.sh[code])S.shErr[code]=err||"No disponible";render()})}
+/* "esta tarde" en la portada: películas con sesión en mis horas, de todos mis cines */
+function tonight(){const by={};myCines().forEach(c=>{sessions(S.sh[c.code],false).forEach(m=>{const k=m.title,e=by[k]||(by[k]={...m,at:[]});e.at.push({c:c.short||c.name,t:m.versions.flatMap(v=>v.times.map(x=>x.t)).sort()})})});return Object.values(by)}
+const tonightCard=m=>`<div class="card press" ${m.id?`data-k="movie" data-i="${m.id}"`:""}><div class="p">${m.poster?`<img loading="lazy" decoding="async" alt="" src="${esc(m.poster)}">`:""}</div><div class="t">${esc(m.title)}</div><div class="y">${m.at.map(a=>esc(a.c)+" "+a.t.slice(0,3).join(" · ")).join("<br>")}</div></div>`;
+function render(){const a=$("#app"),sc=[...a.querySelectorAll(".seg,.rail")].map(e=>e.scrollLeft);
+ TABS.forEach(t=>{document.querySelector(`#dock [data-t=${t}]`).classList.toggle("on",t==S.tab)});$("#ind").style.transform=`translateX(${TABS.indexOf(S.tab)*100}%)`;
+ if(S.q.length>=2){const r=S.res;a.innerHTML=`<h2>Resultados <small>${r&&!r.err?r.length:""}</small></h2>`+(r==null?rail(null):r.err?`<p class="empty">${esc(r.err)}</p>`:r.length?`${sortbar(S.rsort||"rel",["rel",...Object.keys(SORTS)],"rsort")}<div class="grid">${sortRes(r).map((m,i)=>card(m,i)).join("")}</div>`:'<p class="empty">No he encontrado nada.</p>')}
+ else if(S.tab=="inicio"){const up=S.up&&!S.up.err?[...S.up].sort((x,y)=>x.date<y.date?-1:1).slice(0,16):S.up,tn=tonight(),haveSh=myCines().some(c=>S.sh[c.code]);
+  a.innerHTML=`<h2>Plataformas <small>qué hay en cada una</small></h2><div class="rail">${Object.keys(PLAT).sort((a,b)=>S.mine.includes(b)-S.mine.includes(a)).map(pill).join("")}</div>`+
+  (myCines().length?`<h2>Esta tarde en tus cines <small>${S.hours[0]}:00–${S.hours[1]}:00</small></h2>`+(tn.length?`<div class="rail">${tn.map(tonightCard).join("")}</div>`:(haveSh?`<div class="glass note">Hoy no hay sesiones en tu horario. <a data-t="cines" href="#" class="ok">Ver todo el día</a></div>`:rail(null))):"")+
+  `<h2>Tendencias <small>esta semana</small></h2>${rail(S.tr)}`+
+  `<h2>Próximos estrenos <small><a data-ul="1" href="#" style="color:inherit">ver todo</a></small></h2>${up==null?rail(null):up.err?`<p class="empty">${esc(up.err)}</p>`:`<div class="rail">${up.map((m,i)=>card(m,i+4,(()=>{const d=new Date(m.date+"T12:00:00");return DIA[d.getDay()]+" "+d.getDate()+" "+MES[d.getMonth()].slice(0,3)})())).join("")}</div>`}`+
+  (S.mine.length?"":`<div class="glass note"><b>Elige tus plataformas</b><br><span class="mut">Así filtro Películas y Series por las que tienes.</span><br><br><button class="btn glass tint press" data-t="tu">Elegir</button></div>`)}
+ else if(S.tab=="peli")a.innerHTML=viewBrowse("movie");
+ else if(S.tab=="series")a.innerHTML=viewBrowse("tv");
+ else if(S.tab=="cines"){const cs=myCines();
+  a.innerHTML=`<h2>Hoy en tus cines</h2><div class="seg"><span class="chip glass press ${S.showAll?"":"tint"}" data-sh="win">⏰ Mis horas ${S.hours[0]}–${S.hours[1]}h</span><span class="chip glass press ${S.showAll?"tint":""}" data-sh="all">Todo el día</span></div>`+
+  (cs.length?cs.map(cineBox).join(""):'<p class="empty">Pulsa ☆ en un cine para fijarlo.</p>')+
+  `<h2>En cartelera <small>cines de España</small></h2>${sortbar(S.sort)}${rail(sortBy(S.np,S.sort))}`+
+  `<h2>Más cines</h2>${S.favs.filter(c=>!c.code).map(cineRow).join("")}<div class="pad"><button class="btn glass tint press" id="loc">📍 Buscar cines cercanos</button></div>${S.cerr?`<p class="empty warn">${esc(S.cerr)}</p>`:""}${S.cines?(S.cines.length?S.cines.map(cineRow).join(""):'<p class="empty">No he encontrado cines en 12 km.</p>'):""}`;
+  cs.forEach(c=>loadShow(c.code))}
+ else a.innerHTML=`<h2>Mis plataformas</h2><p class="pad mut" style="margin:-4px 0 12px">Marca las que tienes: Películas y Series se filtrarán por ellas. Con las marcadas con <b class="warn">≈</b> (Movistar+, Filmin, Rakuten) no puedo verificar enlaces: te diré "posible", nunca "seguro".</p><div class="chips pad">${Object.entries(PLAT).map(([k,v])=>`<span class="chip glass press ${S.mine.includes(k)?"tint":""}" data-p="${k}">${logo(k)?`<img alt="" src="${esc(logo(k))}" onerror="this.remove()">`:""}${v}${COVERED.has(k)?"":" ≈"}</span>`).join("")}</div><h2>Mis horas de cine</h2><div class="pad" style="display:flex;gap:10px;align-items:center"><select id="h0">${hopt(S.hours[0])}</select> a <select id="h1">${hopt(S.hours[1])}</select></div>`;
+ const sc2=[...a.querySelectorAll(".seg,.rail")];if(sc2.length==sc.length)sc2.forEach((e,i)=>{e.scrollLeft=sc[i]});
+ const mo=$("#more");if(mo)io.observe(mo)}
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const k=S.tab=="peli"?"movie":S.tab=="series"?"tv":null;if(k)loadBrowse(k,true)})},{rootMargin:"700px"});
+/* ---- próximos estrenos (hoja) ---- */
+function openUpcoming(){const d=document.createElement("div");d.className="sheet";openSheet(d);const st={f:"all",s:"date"};
+ const view=()=>{const up=S.up,l=up&&!up.err?up.filter(m=>st.f=="all"||m.type==st.f):null;let h="";
+  if(l){const o=st.s=="hype"?[...l].sort((a,b)=>b.pop-a.pop):l;if(st.s=="date"){let last="";o.forEach(m=>{const x=new Date(m.date+"T12:00:00"),k=MES[x.getMonth()]+" "+x.getFullYear();if(k!=last){h+=`<h2 style="text-transform:capitalize">${k}</h2>`;last=k}h+=upRow(m)})}else h=o.map(upRow).join("")}
+  d.innerHTML=`<div class="bgimg"></div>${closeBtn()}<h2 style="margin-top:calc(70px + env(safe-area-inset-top))">Próximos estrenos</h2>${seg("uf",st.f,[["all","Todo"],["movie","Películas"],["tv","Series"]])}${seg("us",st.s,[["date","📅 Por fecha"],["hype","🔥 Más hype"]])}`+(up==null?rail(null):up.err?`<p class="empty">${esc(up.err)}</p>`:h||'<p class="empty">Sin estrenos.</p>')+'<div style="height:70px"></div>'};
+ d.addEventListener("click",e=>{const t=e.target;if(t.closest(".close"))return closeSheet(d);const c=t.closest("[data-uf],[data-us]");if(c){if(c.dataset.uf)st.f=c.dataset.uf;else st.s=c.dataset.us;buzz(6);view()}});
+ view();loadUp(()=>view())}
 /* ---------- hojas con historial, arrastrar para cerrar ---------- */
 const stack=[];let popping=false;
 function openSheet(el){document.body.append(el);stack.push(el);document.body.style.overflow="hidden";history.pushState({s:stack.length},"");dragClose(el)}
@@ -186,19 +246,23 @@ function openPlatform(sid){const d=document.createElement("div");d.className="sh
   if(c.dataset.ptype){st.type=c.dataset.ptype;load(false)}else if(c.dataset.porder){st.order=c.dataset.porder;load(false)}else load(true)});
  load(false)}
 /* ---------- eventos ---------- */
-function go(t){S.tab=t;sv("tab",t);S.q="";$("#q").value="";$("#sb").classList.remove("has");render();scrollTo({top:0});if(t=="prox")loadUp();if(t=="series")loadSer()}
-document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-upf],[data-usort],[data-sort],[data-rsort],[data-pl],[data-retry],#qx");if(!t)return;
+function go(t){S.tab=t;sv("tab",t);S.q="";$("#q").value="";$("#sb").classList.remove("has");render();scrollTo({top:0});const k=t=="peli"?"movie":t=="series"?"tv":null;if(k&&!BR(k).loaded)loadBrowse(k,false)}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],.card,.up,#loc,[data-bp],[data-bo],[data-bm],[data-bretry],[data-sh],[data-ul],[data-sort],[data-rsort],[data-pl],[data-retry],#qx");if(!t)return;
  if(t.closest(".sheet")&&!(t.matches(".card")))return;
  if(t.id=="qx"){$("#q").value="";S.q="";$("#sb").classList.remove("has");render();return}
  if(t.dataset.t){e.preventDefault();buzz(6);go(t.dataset.t)}
- else if(t.dataset.retry){loadHome();loadUp();loadSer()}
+ else if(t.dataset.retry){loadHome();loadUp()}
  else if(t.dataset.pl){buzz(6);openPlatform(t.dataset.pl)}
  else if(t.classList.contains("card")||t.classList.contains("up")){openTitle(t.dataset.k,t.dataset.i)}
  else if(t.dataset.sort){S.sort=t.dataset.sort;sv("sort",S.sort);buzz(6);render()}
  else if(t.dataset.rsort){S.rsort=t.dataset.rsort;render()}
- else if(t.dataset.upf){S.upf=t.dataset.upf;render()}
- else if(t.dataset.usort){S.usort=t.dataset.usort;render()}
- else if(t.dataset.p){const p=t.dataset.p;S.mine=S.mine.includes(p)?S.mine.filter(x=>x!=p):[...S.mine,p];sv("mine",S.mine);buzz(8);render()}
+ else if(t.dataset.ul){e.preventDefault();openUpcoming()}
+ else if(t.dataset.bp){const v=t.dataset.bp;if(v=="__mine")S.fsel=null;else if(v=="__all")S.fsel=[];else{let c=S.fsel===null?[...S.mine]:[...S.fsel];c=c.includes(v)?c.filter(x=>x!=v):[...c,v];S.fsel=c}sv("fsel",S.fsel);buzz(6);resetBrowse();const k=S.tab=="peli"?"movie":"tv";loadBrowse(k,false)}
+ else if(t.dataset.bo){const k=S.tab=="peli"?"movie":"tv";BR(k).order=t.dataset.bo;buzz(6);loadBrowse(k,false)}
+ else if(t.dataset.bm){loadBrowse(t.dataset.bm,true)}
+ else if(t.dataset.bretry){loadBrowse(t.dataset.bretry,false)}
+ else if(t.dataset.sh){S.showAll=t.dataset.sh=="all";buzz(6);render()}
+ else if(t.dataset.p){const p=t.dataset.p;S.mine=S.mine.includes(p)?S.mine.filter(x=>x!=p):[...S.mine,p];sv("mine",S.mine);buzz(8);resetBrowse();render()}
  else if(t.dataset.f){const c=(S.cines||[]).concat(S.favs,PRESETS).find(x=>x.id==t.dataset.f);if(!c)return;S.favs=S.favs.some(x=>x.id==c.id)?S.favs.filter(x=>x.id!=c.id):[...S.favs,c];sv("favs",S.favs);buzz(8);render()}
  else if(t.id=="loc"){t.textContent="Buscando…";S.cerr="";navigator.geolocation.getCurrentPosition(async p=>{try{S.cines=await api(`/api/cinemas?lat=${p.coords.latitude}&lon=${p.coords.longitude}&radius_km=12`)}catch(er){S.cerr=er.message}render()},()=>{S.cerr="Sin permiso de ubicación. Actívalo en los ajustes del navegador.";render()},{timeout:10000})}});
 document.addEventListener("change",e=>{if(e.target.id=="h0"||e.target.id=="h1"){let a=+$("#h0").value,b=+$("#h1").value;if(b<=a)b=Math.min(23,a+1);S.hours=[a,b];sv("hours",S.hours);render()}});
@@ -208,8 +272,7 @@ $("#q").addEventListener("keydown",e=>{if(e.key=="Enter")e.target.blur()});
 let ticking=false;addEventListener("scroll",()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{$("#top").classList.toggle("sm",scrollY>50);ticking=false})},{passive:true});
 /* ---------- carga ---------- */
 function loadHome(){swr("/api/home",(d,stale,err)=>{if(!d){S.np=S.tr=Object.assign([],{err});S.ser={popular:S.np,airing:S.np};render();return}S.np=L(d.np);S.tr=L(d.tr);S.ser=d.ser;S.logos=d.logos&&!d.logos.error?d.logos:S.logos;render()})}
-function loadUp(){if(S.up&&!S.up.err)return;swr("/api/upcoming",(d,s,err)=>{S.up=d?L(d):Object.assign([],{err});if(S.tab=="prox")render()})}
-function loadSer(){if(S.ser)return;api("/api/series").then(d=>{S.ser=d;render()}).catch(()=>{})}
-render();loadHome();if(S.tab=="prox")loadUp();
+function loadUp(cb){if(S.up&&!S.up.err){cb&&cb();return}swr("/api/upcoming",(d,s,err)=>{S.up=d?L(d):Object.assign([],{err});render();cb&&cb()})}
+render();loadHome();loadUp();myCines().forEach(c=>loadShow(c.code));if(S.tab=="peli")loadBrowse("movie");if(S.tab=="series")loadBrowse("tv");
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 </script></body></html>

@@ -141,3 +141,42 @@ def test_catalogo_tmdb_sin_verificar_y_ordenado(monkeypatch):
 def test_orden_sa():
     assert logic.SA_ORDER["hype"] == "popularity_1week" and logic.SA_ORDER["new"] == "release_date"
     assert "movistar" not in logic.COVERED and "netflix" in logic.COVERED
+
+
+SENSA = """
+<div id="x" data-selected-date="2026-11-14">
+<div class="card entity-card movie-card-theater cf"><a class="meta-title-link" href="/p/1">  Peli Uno </a>
+ <div class="showtimes-version"><div class="text"> 14 de noviembre de 2026 -
+   En Versión doblada </div><div class="hours">
+  <span class="x showtimes-hour-item" data-experiences="[&quot;Format.Projection.3D&quot;]" data-showtime-id="1" data-showtime-time="2026-11-14T19:30:00+01:00"></span>
+  <span class="x showtimes-hour-item" data-experiences="[]" data-showtime-id="2" data-showtime-time="2026-11-14T17:00:00+01:00"></span>
+  <span class="x showtimes-hour-item" data-experiences="[]" data-showtime-id="3" data-showtime-time="2026-11-14T17:00:00+01:00"></span>
+ </div></div>
+ <div class="showtimes-version"><div class="text"> 15 de noviembre de 2026 - En V.O. </div><div class="hours">
+  <span class="x showtimes-hour-item" data-experiences="[]" data-showtime-id="4" data-showtime-time="2026-11-15T11:00:00+01:00"></span></div></div>
+</div>
+<div class="card entity-card movie-card-theater cf"><a class="meta-title-link" href="/p/2">Sin horas</a></div>
+</div>"""
+
+
+def test_parser_sensacine_solo_hoy_sin_duplicados():
+    r = sources.parse_showtimes(SENSA)
+    assert r["date"] == "2026-11-14" and len(r["movies"]) == 1
+    v = r["movies"][0]["versions"]
+    assert r["movies"][0]["title"] == "Peli Uno" and len(v) == 1 and v[0]["label"] == "Doblada"
+    assert [(t["t"], t["fmt"]) for t in v[0]["times"]] == [("17:00", []), ("19:30", ["3D"])]
+
+
+def test_endpoint_cines_solo_lista_permitida():
+    c = TestClient(main.app)
+    assert c.get("/api/showtimes/ZZZZZ").status_code == 404
+
+
+def test_browse_mezcla_verificadas_y_tmdb(monkeypatch):
+    it = lambda i, v: {"id": i, "type": "tv", "title": f"t{i}", "verified": v, "on": []}
+    monkeypatch.setattr(sources, "browse_sa", lambda s, k, o, c: {"items": [it(1, True), it(2, True)], "next": "n", "verified": True})
+    monkeypatch.setattr(sources, "provider_ids", lambda: {"movistar": 149})
+    monkeypatch.setattr(sources, "tmdb_catalog", lambda p, k, o, pg: {"items": [it(2, False), it(3, False)], "next": "2", "verified": False})
+    r = TestClient(main.app).get("/api/browse?type=tv&platforms=netflix,movistar&order=hype&cursor=").json()
+    assert [x["id"] for x in r["items"]] == [1, 2, 3] and r["verified"] is False and r["next"]
+    assert [x["verified"] for x in r["items"]][0] is True

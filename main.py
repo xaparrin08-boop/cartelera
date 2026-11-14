@@ -1,4 +1,4 @@
-import os, threading, time
+import base64, json, os, threading, time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -113,6 +113,76 @@ def platform(sid: str, type: str = "all", order: str = "hype", cursor: str = "")
     if sid not in ids:
         raise HTTPException(404, "Esta plataforma no está disponible en España según TMDB")
     return cached(key, H12, lambda: sources.tmdb_catalog(ids[sid], type, order, int(cursor or 1)))
+
+
+CINES = {"G01LE": "O-Cine Quadernillos (Alcalá de Henares)", "E0291": "Yelmo Parque Corredor (Torrejón de Ardoz)"}
+
+
+@app.get("/api/showtimes/{code}")
+def showtimes(code: str):
+    """Sesiones de HOY de un cine (Sensacine). Solo cines de la lista, para no ser un proxy abierto."""
+    if code not in CINES:
+        raise HTTPException(404, "Cine no disponible")
+    out = cached(f"show:{code}", 3 * 3600, lambda: sources.showtimes(code))
+    return {**out, "cinema": CINES[code], "code": code}
+
+
+def _enc(d):
+    return base64.urlsafe_b64encode(json.dumps(d).encode()).decode()
+
+
+def _dec(s):
+    try:
+        return json.loads(base64.urlsafe_b64decode(s.encode()).decode()) if s else {}
+    except Exception:
+        return {}
+
+
+@app.get("/api/browse")
+def browse(type: str = "tv", platforms: str = "", order: str = "hype", cursor: str = ""):
+    """Películas o series filtradas por varias plataformas a la vez.
+    Las que la API de enlaces cubre van verificadas; Movistar+/Filmin/Rakuten van por TMDB (sin verificar)."""
+    if type not in ("movie", "tv", "all") or order not in logic.SA_ORDER:
+        raise HTTPException(400, "Parámetros no válidos")
+    sids = [s for s in dict.fromkeys(platforms.split(",")) if s in logic.ALIAS]
+    if not sids:
+        sids = sorted(logic.COVERED)
+    cov = [s for s in sids if s in logic.COVERED]
+    unc = [s for s in sids if s not in logic.COVERED]
+    cur = _dec(cursor)
+    key = f"browse:{type}:{','.join(sorted(sids))}:{order}:{cursor}"
+
+    def run():
+        lanes = {}
+        if cov and not cur.get("sa_done"):
+            lanes["sa"] = lambda: sources.browse_sa(cov, type, order, cur.get("sa"))
+        if unc and not cur.get("tm_done"):
+            ids = cached("providerids:es", 7 * H24, sources.provider_ids)
+            pids = [ids[s] for s in unc if s in ids]
+            if pids:
+                lanes["tm"] = lambda: sources.tmdb_catalog(pids, type, order, int(cur.get("tm") or 1))
+        if not lanes:
+            return {"items": [], "next": None, "verified": True}
+        with ThreadPoolExecutor(len(lanes)) as ex:
+            res = {k: f for k, f in zip(lanes, [ex.submit(fn) for fn in lanes.values()])}
+            res = {k: f.result() for k, f in res.items()}
+        a, b = (res.get("sa") or {}).get("items", []), (res.get("tm") or {}).get("items", [])
+        items, seen = [], set()
+        for i in range(max(len(a), len(b))):  # intercalados para que se mezclen
+            for lane in (a, b):
+                if i < len(lane):
+                    x = lane[i]
+                    if (x["type"], x["id"]) not in seen:
+                        seen.add((x["type"], x["id"]))
+                        items.append(x)
+        nxt = {"sa": (res.get("sa") or {}).get("next"), "tm": ((res.get("tm") and res["tm"].get("next")) or None)}
+        nxt = {"sa": nxt["sa"], "sa_done": "sa" not in res and bool(cov) or ("sa" in res and not nxt["sa"]),
+               "tm": nxt["tm"], "tm_done": "tm" not in res or not nxt["tm"]}
+        if not cov:
+            nxt["sa_done"] = True
+        more = not (nxt["sa_done"] and nxt["tm_done"])
+        return {"items": items, "next": _enc(nxt) if more else None, "verified": not unc}
+    return cached(key, H12, run)
 
 
 @app.get("/api/series")

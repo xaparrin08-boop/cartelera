@@ -87,6 +87,7 @@ def provider_ids():
 
 
 def tmdb_catalog(pid, kind="all", order="hype", page=1):
+    pids = pid if isinstance(pid, (list, tuple)) else [pid]
     """Catálogo por TMDB (datos tipo JustWatch): NO verificado, sin enlace directo."""
     from datetime import date
     today = date.today().isoformat()
@@ -95,14 +96,14 @@ def tmdb_catalog(pid, kind="all", order="hype", page=1):
     def job(k):
         sort = {"hype": "popularity.desc", "pop": "vote_count.desc", "rate": "vote_average.desc",
                 "new": "primary_release_date.desc" if k == "movie" else "first_air_date.desc"}[order]
-        p = {"watch_region": "ES", "with_watch_providers": pid, "with_watch_monetization_types": "flatrate",
+        p = {"watch_region": "ES", "with_watch_providers": "|".join(str(x) for x in pids), "with_watch_monetization_types": "flatrate",
              "sort_by": sort, "page": page}
         if order == "new":
             p["primary_release_date.lte" if k == "movie" else "first_air_date.lte"] = today
         if order == "rate":
             p["vote_count.gte"] = 200
         r = tmdb(f"/discover/{k}", **p)
-        return [card(x, k) for x in r.get("results", []) if x.get("poster_path")], r.get("total_pages", 1)
+        return [dict(card(x, k), on=[], verified=False) for x in r.get("results", []) if x.get("poster_path")], r.get("total_pages", 1)
     with ThreadPoolExecutor(2) as ex:
         res = list(ex.map(job, kinds))
     items = [x for r, _ in res for x in r]
@@ -228,13 +229,15 @@ def services():
     return out
 
 
-def platform_catalog(sid, kind="all", order="hype", cursor=None):
-    """Catálogo de una plataforma en España, con enlace directo en cada título."""
+def browse_sa(sids, kind="all", order="hype", cursor=None):
+    """Catálogo de una o varias plataformas en España, con enlace directo en cada título (verificado)."""
     key = os.environ.get("RAPIDAPI_KEY", "")
     if not key:
         raise RuntimeError("Falta RAPIDAPI_KEY")
     base, h = _sa_base_headers(key)
-    p = {"country": COUNTRY, "catalogs": f"{sid}.subscription", "order_by": SA_ORDER.get(order, "popularity_1week"), "order_direction": "desc",
+    sids = list(sids)
+    p = {"country": COUNTRY, "catalogs": ",".join(f"{x}.subscription" for x in sids),
+         "order_by": SA_ORDER.get(order, "popularity_1week"), "order_direction": "desc",
          "series_granularity": "show", "output_language": "es"}
     if kind in ("movie", "tv"):
         p["show_type"] = "movie" if kind == "movie" else "series"
@@ -246,21 +249,24 @@ def platform_catalog(sid, kind="all", order="hype", cursor=None):
     d = r.json()
     items = []
     for x in d.get("shows", []):
-        tm = str(x.get("tmdbId", ""))
-        k, _, i = tm.partition("/")
+        k, _, i = str(x.get("tmdbId", "")).partition("/")
         if not i.isdigit():
             continue
-        ps = (x.get("imageSet") or {}).get("verticalPoster") or {}
-        opt = next((o for o in x.get("streamingOptions", {}).get(COUNTRY, [])
-                    if o.get("service", {}).get("id") == sid and o.get("type") == "subscription" and o.get("link")), None)
-        if not opt:
+        opts = [o for o in x.get("streamingOptions", {}).get(COUNTRY, [])
+                if o.get("service", {}).get("id") in sids and o.get("type") == "subscription" and o.get("link")]
+        if not opts:
             continue  # sin enlace directo no lo enseñamos
+        ps = (x.get("imageSet") or {}).get("verticalPoster") or {}
         items.append({"id": int(i), "type": "movie" if k == "movie" else "tv", "title": x.get("title"),
                       "year": str(x.get("releaseYear") or x.get("firstAirYear") or ""),
                       "poster": ps.get("w360") or ps.get("w240") or ps.get("w480"),
-                      "rating": round((x.get("rating") or 0) / 10, 1), "date": "", "link": opt["link"],
-                      "expires": opt.get("expiresOn")})
+                      "rating": round((x.get("rating") or 0) / 10, 1), "date": "", "link": opts[0]["link"],
+                      "expires": opts[0].get("expiresOn"), "on": sorted({o["service"]["id"] for o in opts}), "verified": True})
     return {"items": items, "next": d.get("nextCursor") if d.get("hasMore") else None, "verified": True}
+
+
+def platform_catalog(sid, kind="all", order="hype", cursor=None):
+    return browse_sa([sid], kind, order, cursor)
 
 
 def tmdb_providers(kind, tid):
@@ -283,4 +289,66 @@ def cinemas_near(lat, lon, radius_m=10000):
         out.append({"id": f'{e["type"][0]}{e["id"]}', "name": t["name"], "lat": la, "lon": lo,
                     "website": t.get("website") or t.get("contact:website"),
                     "address": " ".join(filter(None, [t.get("addr:street"), t.get("addr:housenumber"), t.get("addr:city")]))})
+    return out
+
+
+# ---------------- Horarios de cine (Sensacine, solo "hoy") ----------------
+import re, html as _html
+SENSACINE = "https://www.sensacine.com/cines/cine/{code}/"
+UA = "Mozilla/5.0 (compatible; CarteleraPersonal/1.0)"
+
+
+def _exp(raw):
+    t = _html.unescape(raw or "").lower()
+    return [n for k, n in (("imax", "IMAX"), ("3d", "3D"), ("4dx", "4DX"), ("screenx", "ScreenX"), ("dolby", "Dolby"), ("premium", "Premium")) if k in t]
+
+
+def parse_showtimes(page):
+    """HTML de la página de un cine de Sensacine -> películas con sus sesiones de HOY (sin duplicados)."""
+    sel = re.search(r'data-selected-date="([^"]+)"', page)
+    day = sel.group(1) if sel else None
+    movies = []
+    for chunk in page.split('movie-card-theater')[1:]:
+        t = re.search(r'meta-title-link[^>]*>\s*([^<]+?)\s*<', chunk)
+        if not t:
+            continue
+        versions = {}
+        for vb in chunk.split('class="showtimes-version')[1:]:
+            lab = re.search(r'<div class="text">\s*(.*?)\s*</div>', vb, re.S)
+            text = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", "", lab.group(1)))).strip() if lab else ""
+            label = text.split(" - ", 1)[-1].strip().replace("En Versión doblada", "Doblada").replace("En V.O.", "V.O.")
+            for tag in re.findall(r'<span[^>]*data-showtime-time="[^"]+"[^>]*>', vb):
+                iso = re.search(r'data-showtime-time="([^"]+)"', tag).group(1)
+                m = re.match(r"(\d{4}-\d\d-\d\d)T(\d\d:\d\d)", iso)
+                if not m or (day and m.group(1) != day):
+                    continue  # solo hoy
+                ex = re.search(r'data-experiences="([^"]*)"', tag)
+                fmt = tuple(_exp(ex.group(1) if ex else ""))
+                versions.setdefault(label, set()).add((m.group(2), fmt))
+        vs = [{"label": lb, "times": [{"t": a, "fmt": list(f)} for a, f in sorted(ts)]} for lb, ts in versions.items() if ts]
+        if vs:
+            movies.append({"title": _html.unescape(t.group(1)), "versions": vs})
+    return {"date": day, "movies": movies}
+
+
+def showtimes(code):
+    r = requests.get(SENSACINE.format(code=code), headers={"User-Agent": UA, "Accept-Language": "es-ES,es;q=0.9"}, timeout=20)
+    if r.status_code != 200:
+        raise RuntimeError(f"Sensacine respondió {r.status_code}")
+    out = parse_showtimes(r.text)
+    if not out["movies"]:
+        raise RuntimeError("No he encontrado sesiones en la página (¿cambió el formato?)")
+    # enlazar cada título con su ficha de TMDB (para póster y para abrir la ficha)
+    def match(m):
+        try:
+            res = [x for x in search(m["title"]) if x["type"] == "movie"]
+            if res:
+                m.update(id=res[0]["id"], poster=res[0]["poster"], rating=res[0]["rating"])
+        except Exception:
+            pass
+        return m
+    with ThreadPoolExecutor(6) as ex:
+        out["movies"] = list(ex.map(match, out["movies"]))
+    out["source"] = "Sensacine"
+    out["url"] = SENSACINE.format(code=code)
     return out
