@@ -155,7 +155,7 @@ def details(kind, tid):
     directors = [c["name"] for c in cr.get("crew", []) if c.get("job") == "Director"][:3] or [c["name"] for c in d.get("created_by", [])][:3]
     similar = [card(x, kind) for x in (d.get("recommendations") or {}).get("results", []) if x.get("poster_path")][:14]
     return {**card(d, kind), "imdb_id": imdb, "cast": cast, "directors": directors, "similar": similar,
-            "countries": [c["name"] for c in d.get("production_countries", [])], "overview": d.get("overview"), "genres": [g["name"] for g in d.get("genres", [])],
+            "countries": [c["iso_3166_1"] for c in d.get("production_countries", []) if c.get("iso_3166_1")], "overview": d.get("overview"), "genres": [g["name"] for g in d.get("genres", [])],
             "backdrop": IMG + "w780" + d["backdrop_path"] if d.get("backdrop_path") else None,
             "runtime": d.get("runtime")}
 

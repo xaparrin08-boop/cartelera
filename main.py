@@ -217,7 +217,7 @@ def title(kind: str, tid: int, mine: str = ""):
         except HTTPException:
             return [], False  # sin fuente de enlaces: no se afirma nada como disponible
     with ThreadPoolExecutor(3) as ex:
-        f_info = ex.submit(lambda: cached(f"det2:{kind}:{tid}", 7 * H24, lambda: sources.details(kind, tid)))
+        f_info = ex.submit(lambda: cached(f"det3:{kind}:{tid}", 7 * H24, lambda: sources.details(kind, tid)))
         f_sa = ex.submit(get_sa)
         f_prov = ex.submit(lambda: cached(f"prov:{kind}:{tid}", H12, lambda: sources.tmdb_providers(kind, tid)))
         info, (opts, verified), prov = f_info.result(), f_sa.result(), f_prov.result()
