@@ -172,6 +172,23 @@ def _sa_base_headers(key):
     return _good
 
 
+def services():
+    """Plataformas que cubre la API en España: [{id, name, logo}]."""
+    key = os.environ.get("RAPIDAPI_KEY", "")
+    if not key:
+        raise RuntimeError("Falta RAPIDAPI_KEY")
+    base, h = _sa_base_headers(key)
+    r = requests.get(f"{base}/countries/{COUNTRY}", headers=h, timeout=12)
+    if r.status_code != 200:
+        raise RuntimeError(f"Servicios no disponibles ({r.status_code})")
+    out = []
+    for x in r.json().get("services", []):
+        im = x.get("imageSet") or {}
+        out.append({"id": x["id"], "name": x.get("name"), "logo": im.get("lightThemeImage") or im.get("whiteImage"),
+                    "types": sorted((x.get("supportedStreamingTypes") or {}).keys()) if isinstance(x.get("supportedStreamingTypes"), dict) else x.get("supportedStreamingTypes")})
+    return out
+
+
 def platform_catalog(sid, kind="all", order="popularity_1week", cursor=None):
     """Catálogo de una plataforma en España, con enlace directo en cada título."""
     key = os.environ.get("RAPIDAPI_KEY", "")

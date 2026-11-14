@@ -33,6 +33,11 @@ def nowplaying():
     return cached("nowplaying:es", H6, sources.now_playing)
 
 
+@app.get("/api/services")
+def services():
+    return cached("services:es", 7 * H24, sources.services)
+
+
 @app.get("/api/platform/{sid}")
 def platform(sid: str, type: str = "all", order: str = "popularity_1week", cursor: str = ""):
     if sid not in logic.ALIAS or type not in ("all", "movie", "tv") or order not in (
